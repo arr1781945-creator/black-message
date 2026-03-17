@@ -1,0 +1,96 @@
+version: "3.9"
+
+services:
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: securebank_slack
+      POSTGRES_USER: sbslack_admin
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sbslack_admin -d securebank_slack"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme}
+    volumes:
+      - redisdata:/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+
+  ipfs:
+    image: ipfs/kubo:latest
+    restart: unless-stopped
+    volumes:
+      - ipfsdata:/data/ipfs
+    ports:
+      - "5001:5001"   # API (internal only in prod)
+    networks: [internal]
+
+  web:
+    build:
+      context: ..
+      dockerfile: devops/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:     { condition: service_healthy }
+      redis:  { condition: service_healthy }
+    env_file: ../.env
+    volumes:
+      - ../staticfiles:/app/staticfiles
+      - ../mediafiles:/app/mediafiles
+      - ../logs:/app/logs
+      - /run/secrets/kyber_private.key:/secrets/kyber_private.key:ro
+      - /run/secrets/dilithium_private.key:/secrets/dilithium_private.key:ro
+    ports:
+      - "8000:8000"
+    networks: [internal, external]
+    command: >
+      sh -c "python manage.py migrate --no-input &&
+             python manage.py collectstatic --no-input &&
+             daphne -b 0.0.0.0 -p 8000 core.asgi:application"
+
+  celery:
+    build:
+      context: ..
+      dockerfile: devops/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - web
+    env_file: ../.env
+    command: celery -A core worker -l INFO -c 4
+    networks: [internal]
+
+  celery-beat:
+    build:
+      context: ..
+      dockerfile: devops/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - celery
+    env_file: ../.env
+    command: celery -A core beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    networks: [internal]
+
+volumes:
+  pgdata:
+  redisdata:
+  ipfsdata:
+
+networks:
+  internal:
+    driver: bridge
+    internal: true       # No direct internet access for internal services
+  external:
+    driver: bridge

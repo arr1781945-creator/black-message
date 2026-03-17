@@ -1,0 +1,33 @@
+liboqs loaded — PQC fully active
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_txn_user_date ON
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_txn_risk_flagged
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_txn_status ON co
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_aml_user_severit
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_aml_unresolved O
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_chain_hash ON co
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_chain_seq ON com
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_msg_channel_date
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_user_clearance O
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_txn_user_date ON
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_txn_risk_flagged
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_txn_status ON co
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_aml_user_severit
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_aml_unresolved O
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_chain_hash ON co
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_chain_seq ON com
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_msg_channel_date
+Index created: CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_user_clearance O
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active
+liboqs loaded — PQC fully active

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta http-equiv="Content-Security-Policy"
+    content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval'
+        https://cdn.tailwindcss.com
+        https://cdn.jsdelivr.net
+        https://fonts.googleapis.com;
+      style-src 'self' 'unsafe-inline'
+        https://fonts.googleapis.com
+        https://fonts.gstatic.com
+        https://cdn.jsdelivr.net;
+      font-src 'self'
+        https://fonts.gstatic.com
+        https://cdn.jsdelivr.net
+        data:;
+      img-src 'self' data: blob:
+        https://cdn.jsdelivr.net;
+      connect-src 'self' wss: ws:
+        https://cdn.tailwindcss.com
+        https://cdn.jsdelivr.net;
+      frame-src 'none';
+      object-src 'none';
+    "/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BlackMess — Secure Messaging</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bank: {
+              50:'#f8fafc', 100:'#e2e8f0', 200:'#cbd5e1',
+              300:'#94a3b8', 400:'#64748b', 500:'#475569',
+              600:'#334155', 700:'#1e293b', 800:'#0f172a',
+              850:'#0a1120', 900:'#080e1a', 950:'#050c14',
+            },
+            vault: {
+              400:'#fbbf24', 500:'#f59e0b', 600:'#d97706',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { font-family: 'Inter', sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #050c14; color: #e2e8f0; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+    [contenteditable]:empty:before { content: attr(data-placeholder); color: #475569; pointer-events: none; }
+    [contenteditable]:focus { outline: none; }
+    .scrollbar-thin { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+    .fade-in { animation: fadeInUp 200ms ease forwards; }
+  </style>
+</head>
+<body class="h-screen overflow-hidden bg-bank-950">
+
+  <!-- Boot screen -->
+  <div id="boot-screen" class="fixed inset-0 bg-bank-950 flex flex-col items-center justify-center z-50 gap-4">
+    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-600 to-blue-700 flex items-center justify-center shadow-2xl">
+      <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+      </svg>
+    </div>
+    <h1 class="text-white font-bold text-2xl tracking-tight">BlackMess</h1>
+    <p class="text-slate-500 text-sm">Initializing secure session...</p>
+    <div class="flex gap-1.5 mt-2">
+      <div class="w-2 h-2 rounded-full bg-yellow-600 animate-bounce" style="animation-delay:0ms"></div>
+      <div class="w-2 h-2 rounded-full bg-yellow-600 animate-bounce" style="animation-delay:150ms"></div>
+      <div class="w-2 h-2 rounded-full bg-yellow-600 animate-bounce" style="animation-delay:300ms"></div>
+    </div>
+  </div>
+
+  <div id="app" class="h-screen"></div>
+
+  <script src="/static/utils/anti_screenshot.js"></script>
+  <script type="module" src="/static/app.js"></script>
+  <!-- Eruda Mobile Console -->
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>eruda.init();</script>
+</body>
+</html>
