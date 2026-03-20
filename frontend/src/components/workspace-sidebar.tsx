@@ -63,7 +63,7 @@ export function WorkspaceSidebar({ activePage, onPageChange, currentUser, onLogo
 
       {/* Profile */}
       <div className="pt-2 border-t border-border">
-        <button className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-sm font-semibold text-white">
+        <button className="w-9 h-9 rounded-full bg-[#222222] flex items-center justify-center text-sm font-semibold text-white">
           J
         </button>
       </div>

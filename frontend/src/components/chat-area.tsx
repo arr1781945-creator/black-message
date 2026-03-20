@@ -58,7 +58,7 @@ export function ChatArea({ channel = "umum", currentUser }: {
           id: data.id || Date.now().toString(),
           user: data.user,
           avatar: data.avatar,
-          color: 'from-violet-500 to-purple-600',
+          color: 'from-gray-700 to-gray-800',
           time: data.time,
           content: data.message,
           isNew: true
@@ -90,7 +90,7 @@ export function ChatArea({ channel = "umum", currentUser }: {
         id: msgId,
         user: currentUser?.name || 'Saya',
         avatar: currentUser?.avatar || 'S',
-        color: 'from-violet-500 to-purple-600',
+        color: 'from-gray-700 to-gray-800',
         time: now,
         content: input.trim(),
       }])
@@ -136,7 +136,7 @@ export function ChatArea({ channel = "umum", currentUser }: {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         <div className="text-center py-6">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-3">
+          <div className="w-12 h-12 rounded-full bg-[#222222] flex items-center justify-center mx-auto mb-3">
             <HashIcon className="w-6 h-6 text-white"/>
           </div>
           <h3 className="font-bold text-foreground">#{channel}</h3>

@@ -72,7 +72,7 @@ const DmsPage = ({ currentUser }: { currentUser: User }) => {
             <button key={m.id} onClick={() => setActiveDM(m.id)}
               className={`flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-sm transition-colors ${activeDM===m.id ? 'bg-sidebar-accent text-sidebar-accent-foreground' : 'text-sidebar-foreground hover:bg-sidebar-accent'}`}>
               <div className="relative flex-shrink-0">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold">{m.avatar}</div>
+                <div className="w-7 h-7 rounded-full bg-[#222222] flex items-center justify-center text-white text-xs font-bold">{m.avatar}</div>
                 <div className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-sidebar"/>
               </div>
               {m.name}
@@ -101,7 +101,7 @@ const DmsPage = ({ currentUser }: { currentUser: User }) => {
       {activeDM !== null && activeMember ? (
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="h-14 border-b border-border flex items-center px-4 gap-3 flex-shrink-0">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold">{activeMember.avatar}</div>
+            <div className="w-8 h-8 rounded-full bg-[#222222] flex items-center justify-center text-white text-sm font-bold">{activeMember.avatar}</div>
             <span className="text-foreground font-semibold">{activeMember.name}</span>
             <div className="flex-1"/>
             <button className="p-2 rounded-lg hover:bg-accent text-muted-foreground hover:text-foreground transition-colors">
@@ -117,7 +117,7 @@ const DmsPage = ({ currentUser }: { currentUser: User }) => {
             )}
             {(messages[activeDM]||[]).map((msg, i) => (
               <div key={i} className={`flex ${msg.mine ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${msg.mine ? 'bg-indigo-600 text-white' : 'bg-muted text-foreground'}`}>
+                <div className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${msg.mine ? 'bg-white text-white' : 'bg-muted text-foreground'}`}>
                   <div>{msg.text}</div>
                   <div className="text-xs opacity-60 mt-0.5 text-right">{msg.time}</div>
                 </div>
@@ -171,7 +171,7 @@ const VideoCallPage = ({ user, onClose }: { user: User, onClose: () => void }) =
       {/* Remote (placeholder) */}
       <div className="flex-1 bg-[#111] flex items-center justify-center relative">
         <div className="text-center">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-4xl font-bold mx-auto mb-4">
+          <div className="w-24 h-24 rounded-full bg-[#222222] flex items-center justify-center text-white text-4xl font-bold mx-auto mb-4">
             {user.avatar}
           </div>
           <p className="text-white font-semibold text-lg">{user.name}</p>
@@ -532,7 +532,7 @@ const ProfilePage = ({ user, onLogout, onBack }: { user: User, onLogout: () => v
       </div>
       <div className="max-w-md">
         <div className="flex items-center gap-4 mb-6 p-4 rounded-xl bg-accent border border-border">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">{user.avatar}</div>
+          <div className="w-16 h-16 rounded-full bg-[#222222] flex items-center justify-center text-white text-2xl font-bold">{user.avatar}</div>
           <div>
             <div className="text-foreground font-bold text-lg">{user.name}</div>
             <div className="text-muted-foreground text-sm">{user.email}</div>
