@@ -161,14 +161,14 @@ class LoginSession(models.Model):
     """Tracked login sessions — one row per device login."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(BankUser, on_delete=models.CASCADE, related_name="sessions")
-    refresh_jti = models.CharField(max_length=255, unique=True, db_index=True)
+    refresh_jti = models.CharField(max_length=255, unique=True, db_index=True, default="", blank=True)
     ip_address = models.GenericIPAddressField()
     user_agent = models.CharField(max_length=512, blank=True)
     device_fingerprint = models.CharField(max_length=128, blank=True)
     country_code = models.CharField(max_length=4, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_seen = models.DateTimeField(auto_now=True)
-    expires_at = models.DateTimeField()
+    expires_at = models.DateTimeField(null=True, blank=True, )
     is_revoked = models.BooleanField(default=False)
     revoked_reason = models.CharField(max_length=64, blank=True)
 
@@ -215,7 +215,7 @@ class InviteToken(models.Model):
     role = models.ForeignKey(UserRole, on_delete=models.PROTECT)
     token_hash = models.CharField(max_length=256, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
+    expires_at = models.DateTimeField(null=True, blank=True, )
     used_at = models.DateTimeField(null=True, blank=True)
     used_by = models.ForeignKey(BankUser, on_delete=models.SET_NULL, null=True, related_name="used_invites")
 
@@ -697,7 +697,7 @@ class PrivilegedAccessManagement(models.Model):
         ('active','Active'), ('completed','Completed'),
         ('revoked','Revoked'),
     ], default='pending')
-    expires_at = models.DateTimeField(null=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
 

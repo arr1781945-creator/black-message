@@ -1,7 +1,5 @@
 "use client"
 
-"use client"
-
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import {
@@ -58,7 +56,6 @@ export function WorkspaceSidebar({ activePage, onPageChange, currentUser, onLogo
         <NavButton icon={BookmarkIcon} label="Tersimpan" active={activePage === "saved"} onClick={() => onPageChange("saved")} />
         <NavButton icon={FileIcon} label="Berkas" active={activePage === "files"} onClick={() => onPageChange("files")} />
         <NavButton icon={AppsIcon} label="Aplikasi" active={activePage === "apps"} onClick={() => onPageChange("apps")} />
-        <NavButton icon={BotIcon} label="AI" active={activePage === "ai"} onClick={() => onPageChange("ai")} />
         <NavButton icon={MoreIcon} label="Lagi" active={activePage === "more"} onClick={() => onPageChange("more")} />
       </div>
 

@@ -1192,7 +1192,6 @@ export default function App() {
         </>
       )
       case 'dms': return <DmsPage currentUser={user} />
-      case 'ai': return <AIPage currentUser={user} />
       case 'compliance': return <CompliancePage currentUser={user} />
       case 'activity': return <ActivityPage />
       case 'saved': return <SavedPage />

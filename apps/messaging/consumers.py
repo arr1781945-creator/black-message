@@ -8,13 +8,28 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.channel_name_slug = self.scope['url_route']['kwargs']['channel_name']
         self.room_group_name = f'chat_{self.channel_name_slug}'
 
-        # Join room group
+        # Auth check - cek token dari query string
+        query_string = self.scope.get('query_string', b'').decode()
+        token = None
+        for param in query_string.split('&'):
+            if param.startswith('token='):
+                token = param.split('=', 1)[1]
+                break
+
+        # Verifikasi JWT token
+        if token:
+            try:
+                from rest_framework_simplejwt.tokens import AccessToken
+                AccessToken(token)
+            except Exception:
+                await self.close(code=4001)
+                return
+
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
         await self.accept()
-        print(f"WebSocket connected: {self.room_group_name}")
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(

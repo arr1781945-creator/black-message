@@ -1,9 +1,11 @@
+import * as OTPAuth from 'otpauth'
+import QRCode from 'react-qr-code'
 const API_URL = 'http://localhost:8002/api/v1/auth'
 
 import { startRegistration } from '@simplewebauthn/browser'
 import { useState } from 'react'
 
-type Step = 'login' | 'register' | 'verify-email' | 'kyc' | 'usb' | 'auth' | 'done'
+type Step = 'login' | 'register' | 'verify-email' | 'totp-setup' | 'kyc' | 'usb' | 'auth' | 'done'
 
 interface User {
   name: string
@@ -286,7 +288,8 @@ function VerifyEmailStep({ user, onNext }: { user: User, onNext: () => void }) {
         })
         if (res.ok) {
           const s: any[] = JSON.parse(localStorage.getItem('bm_users') || '[]')
-          localStorage.setItem('bm_users', JSON.stringify(s.map(u => u.email === user.email ? {...u, verified: true} : u)))
+          const updatedUsers = JSON.parse(localStorage.getItem('bm_users') || '[]')
+          localStorage.setItem('bm_users', JSON.stringify(updatedUsers.map((u: any) => u.email === user.email ? {...u, verified: true} : u)))
           onNext()
           return
         }
@@ -294,7 +297,8 @@ function VerifyEmailStep({ user, onNext }: { user: User, onNext: () => void }) {
         // Fallback demo mode
         if (enteredOTP === '123456') {
           const s: any[] = JSON.parse(localStorage.getItem('bm_users') || '[]')
-          localStorage.setItem('bm_users', JSON.stringify(s.map(u => u.email === user.email ? {...u, verified: true} : u)))
+          const updatedUsers = JSON.parse(localStorage.getItem('bm_users') || '[]')
+          localStorage.setItem('bm_users', JSON.stringify(updatedUsers.map((u: any) => u.email === user.email ? {...u, verified: true} : u)))
           onNext()
           return
         }
@@ -761,8 +765,8 @@ function AuthStep({ user, onNext }: { user: User, onNext: () => void }) {
                   </svg>
                 </div>
                 <div>
-                  <div className="text-white font-semibold text-sm">Kode Email OTP</div>
-                  <div className="text-gray-500 text-xs">Kirim kode ke {user.email}</div>
+                  <div className="text-white font-semibold text-sm">Authenticator App</div>
+                  <div className="text-gray-500 text-xs">Google Authenticator / Authy</div>
                 </div>
               </button>
             </div>
@@ -780,8 +784,8 @@ function AuthStep({ user, onNext }: { user: User, onNext: () => void }) {
           </div>
         ) : (
           <>
-            <h2 className="text-white font-bold text-lg mb-1">Kode OTP</h2>
-            <p className="text-gray-400 text-sm mb-6">Masukkan 6 digit kode dari email</p>
+            <h2 className="text-white font-bold text-lg mb-1">Authenticator App</h2>
+            <p className="text-gray-400 text-sm mb-6">Masukkan 6 digit kode dari Google Authenticator / Authy</p>
             {error && <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-2 text-red-400 text-xs mb-4">{error}</div>}
             <div className="flex gap-2 justify-center mb-4">
               {otp.map((d, i) => (
@@ -791,8 +795,127 @@ function AuthStep({ user, onNext }: { user: User, onNext: () => void }) {
                   className="w-11 h-14 text-center text-xl font-bold rounded-xl bg-black border border-gray-700 text-white outline-none focus:border-white transition-colors"/>
               ))}
             </div>
-            <p className="text-gray-600 text-xs text-center">Demo: <span className="text-white font-bold">123456</span></p>
+            <p className="text-gray-600 text-xs text-center">Buka Authenticator App di HP kamu</p>
             <button onClick={() => setMethod(null)} className="text-gray-500 text-xs mt-3 hover:text-white w-full text-center">← Kembali</button>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+
+// ─── TOTP Setup Step (Google Authenticator) ──────────────────────────────────
+function TOTPSetupStep({ user, onNext }: { user: User, onNext: () => void }) {
+  const [secret] = useState(() => {
+    // Generate secret - simpan di sessionStorage bukan localStorage (lebih aman)
+    const sessionKey = `bm_totp_${btoa(user.email)}`
+    const saved = sessionStorage.getItem(sessionKey)
+    if (saved) return saved
+    const newSecret = Array.from(crypto.getRandomValues(new Uint8Array(20)))
+      .map(b => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'[b % 32])
+      .join('')
+    sessionStorage.setItem(sessionKey, newSecret)
+    return newSecret
+  })
+
+  const [code, setCode] = useState(['','','','','',''])
+  const [error, setError] = useState('')
+  const [verified, setVerified] = useState(false)
+  const [step, setStep] = useState<'qr'|'verify'>('qr')
+
+  const otpauth = `otpauth://totp/BlackMess:${encodeURIComponent(user.email)}?secret=${secret}&issuer=BlackMess&algorithm=SHA1&digits=6&period=30`
+
+  const verifyCode = () => {
+    const enteredCode = code.join('')
+    const totp = new OTPAuth.TOTP({
+      issuer: 'BlackMess',
+      label: user.email,
+      algorithm: 'SHA1',
+      digits: 6,
+      period: 30,
+      secret: OTPAuth.Secret.fromBase32(secret)
+    })
+    const delta = totp.validate({ token: enteredCode, window: 1 })
+    if (delta !== null) {
+      setVerified(true)
+      sessionStorage.setItem(`bm_totp_ok_${btoa(user.email)}`, 'true')
+      setTimeout(() => onNext(), 800)
+    } else {
+      setError('Kode salah! Coba lagi.')
+      setCode(['','','','','',''])
+      document.getElementById('totp-0')?.focus()
+    }
+  }
+
+  const handleChange = (i: number, val: string) => {
+    if (!/^\d*$/.test(val)) return
+    const n = [...code]; n[i] = val.slice(-1); setCode(n)
+    if (val && i < 5) document.getElementById(`totp-${i+1}`)?.focus()
+    if (n.every(d => d) && i === 5) {
+      setTimeout(() => verifyCode(), 100)
+    }
+  }
+
+  return (
+    <div className="w-full max-w-sm">
+      <div className="text-center mb-6">
+        <div className="w-16 h-16 rounded-2xl bg-black border border-gray-800 flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <h1 className="text-white font-bold text-2xl">BlackMess</h1>
+        <p className="text-gray-400 text-sm mt-1">Setup Google Authenticator</p>
+      </div>
+
+      <div className="bg-[#111] border border-gray-800 rounded-2xl p-6">
+        {verified ? (
+          <div className="text-center py-4">
+            <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <p className="text-white font-semibold">Google Authenticator Terdaftar!</p>
+            <p className="text-gray-400 text-sm mt-1">Melanjutkan setup...</p>
+          </div>
+        ) : step === 'qr' ? (
+          <>
+            <h2 className="text-white font-bold text-lg mb-1">Scan QR Code</h2>
+            <p className="text-gray-400 text-sm mb-4">Buka Google Authenticator → Tambah akun → Scan kode QR</p>
+            
+            {/* QR Code */}
+            <div className="bg-white p-4 rounded-xl mb-4 flex items-center justify-center">
+              <QRCode value={otpauth} size={180} />
+            </div>
+
+            {/* Manual entry */}
+            <div className="bg-black border border-gray-800 rounded-xl p-3 mb-4">
+              <p className="text-gray-500 text-xs mb-1">Atau masukkan kode manual:</p>
+              <p className="text-white text-xs font-mono break-all">{secret}</p>
+            </div>
+
+            <button onClick={() => setStep('verify')}
+              className="w-full py-3 rounded-xl bg-white text-black font-bold text-sm hover:bg-gray-100">
+              Sudah Scan → Verifikasi
+            </button>
+          </>
+        ) : (
+          <>
+            <h2 className="text-white font-bold text-lg mb-1">Verifikasi Kode</h2>
+            <p className="text-gray-400 text-sm mb-6">Masukkan 6 digit kode dari Google Authenticator</p>
+            {error && <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-2 text-red-400 text-xs mb-4">{error}</div>}
+            <div className="flex gap-2 justify-center mb-4">
+              {code.map((d, i) => (
+                <input key={i} id={`totp-${i}`} type="text" inputMode="numeric"
+                  maxLength={1} value={d}
+                  onChange={e => handleChange(i, e.target.value)}
+                  onKeyDown={e => { if(e.key==='Backspace' && !d && i > 0) document.getElementById(`totp-${i-1}`)?.focus() }}
+                  className="w-11 h-14 text-center text-xl font-bold rounded-xl bg-black border border-gray-700 text-white outline-none focus:border-white transition-colors"/>
+              ))}
+            </div>
+            <button onClick={() => setStep('qr')} className="text-gray-500 text-xs w-full text-center hover:text-white">← Kembali ke QR Code</button>
           </>
         )}
       </div>
@@ -817,6 +940,11 @@ export function AuthFlow({ onComplete }: { onComplete: (user: User) => void }) {
       {step === 'kyc' && user && <KYCStep user={user} onNext={() => setStep('usb')} />}
       {step === 'usb' && user && <USBStep user={user} onComplete={onComplete} />}
       {step === 'auth' && user && <AuthStep user={user} onNext={() => onComplete(user)} />}
+      {step === 'totp-setup' && user && (
+        <div className="min-h-screen bg-black flex items-center justify-center p-4">
+          <TOTPSetupStep user={user} onNext={() => { setStep('kyc') }} />
+        </div>
+      )}
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import uuid
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -34,7 +35,7 @@ class LoginView(APIView):
             'access': str(refresh.access_token),
             'refresh': str(refresh),
             'user': UserSerializer(user).data,
-            'mfa_required': user.mfa_devices.filter(confirmed=True).exists(),
+            'mfa_required': user.mfa_devices.filter(is_confirmed=True).exists(),
         })
 
 
