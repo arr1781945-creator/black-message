@@ -657,6 +657,32 @@ const CompliancePage = ({ currentUser }: { currentUser: any }) => {
           <button className="w-full py-2.5 rounded-xl border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/10 transition-colors">
             Request Emergency Access
           </button>
+
+        {/* Export for Audit */}
+        <div className="bg-accent border border-border rounded-xl p-4">
+          <h3 className="text-foreground font-semibold text-sm mb-3">Export for Audit OJK/BI</h3>
+          <p className="text-muted-foreground text-xs mb-3">Download riwayat komunikasi untuk keperluan audit regulasi</p>
+          <div className="grid grid-cols-3 gap-2">
+            <a href="http://localhost:8002/api/v1/compliance/export/pdf/?days=30"
+              className="py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium text-center hover:bg-red-500/20 transition-colors">
+              PDF
+            </a>
+            <a href="http://localhost:8002/api/v1/compliance/export/excel/?days=30"
+              className="py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-medium text-center hover:bg-green-500/20 transition-colors">
+              Excel
+            </a>
+            <a href="http://localhost:8002/api/v1/compliance/export/json/?days=30"
+              className="py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-medium text-center hover:bg-blue-500/20 transition-colors">
+              JSON
+            </a>
+          </div>
+          <select className="w-full mt-2 px-3 py-2 rounded-xl bg-background border border-border text-foreground text-xs outline-none">
+            <option value="7">7 hari terakhir</option>
+            <option value="30" selected>30 hari terakhir</option>
+            <option value="90">90 hari terakhir</option>
+            <option value="365">1 tahun terakhir</option>
+          </select>
+        </div>
         </div>
       </div>
     </div>
