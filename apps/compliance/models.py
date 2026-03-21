@@ -1138,3 +1138,82 @@ class AlertInstance(models.Model):
     resolved_at = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta: db_table = 'compliance_alert_instance'
+
+
+class ImmutableAuditLog(models.Model):
+    """Audit log yang tidak bisa dimanipulasi - standar OJK/BI"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace_id = models.CharField(max_length=50, db_index=True)
+    sender_id = models.CharField(max_length=50)
+    receiver_id = models.CharField(max_length=50, blank=True)
+    message_hash = models.CharField(max_length=64)  # SHA-256
+    channel = models.CharField(max_length=100)
+    action = models.CharField(max_length=50)  # sent, deleted, edited, read
+    device_info = models.TextField(blank=True)
+    ip_address = models.GenericIPAddressField(null=True)
+    prev_hash = models.CharField(max_length=64)  # Hash dari log sebelumnya
+    chain_hash = models.CharField(max_length=64, unique=True)  # Hash entry ini
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    
+    class Meta:
+        db_table = 'compliance_immutable_audit'
+        app_label = 'compliance'
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f"{self.action} by {self.sender_id} at {self.created_at}"
+
+class ShamirKeyShare(models.Model):
+    """Shamir's Secret Sharing - pecah master key jadi 3 bagian"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace_id = models.CharField(max_length=50)
+    share_index = models.PositiveSmallIntegerField()  # 1, 2, atau 3
+    share_holder = models.CharField(max_length=100)  # Direktur Kepatuhan, Head IT, dll
+    share_holder_id = models.CharField(max_length=50)
+    encrypted_share = models.TextField()  # Share terenkripsi
+    threshold = models.PositiveSmallIntegerField(default=2)  # Minimal 2 dari 3
+    total_shares = models.PositiveSmallIntegerField(default=3)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'compliance_shamir_share'
+        app_label = 'compliance'
+        unique_together = ['workspace_id', 'share_index']
+
+class ChannelPolicy(models.Model):
+    """Kebijakan channel - self-destruct boleh/tidak"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace_id = models.CharField(max_length=50)
+    channel_name = models.CharField(max_length=100)
+    channel_type = models.CharField(max_length=20, choices=[
+        ('general', 'General Chat'),
+        ('official', 'Official Instruction'),
+        ('operational', 'Operational'),
+    ], default='general')
+    allow_self_destruct = models.BooleanField(default=True)
+    retention_days = models.PositiveIntegerField(default=365)  # Retensi data
+    require_audit = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'compliance_channel_policy'
+        app_label = 'compliance'
+        unique_together = ['workspace_id', 'channel_name']
+
+class EmergencyAccessLog(models.Model):
+    """Log akses darurat - ketika 2 dari 3 pemegang kunci setuju"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    workspace_id = models.CharField(max_length=50)
+    requested_by = models.CharField(max_length=50)
+    reason = models.TextField()
+    approver_1 = models.CharField(max_length=50, blank=True)
+    approver_2 = models.CharField(max_length=50, blank=True)
+    approved_at = models.DateTimeField(null=True)
+    target_user_id = models.CharField(max_length=50)
+    access_granted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'compliance_emergency_access'
+        app_label = 'compliance'

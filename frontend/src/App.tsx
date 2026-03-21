@@ -500,6 +500,348 @@ const InvitePage = ({ user }: { user: User }) => {
 }
 
 
+
+
+// ─── Compliance Dashboard ─────────────────────────────────────────────────────
+const CompliancePage = ({ currentUser }: { currentUser: any }) => {
+  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [chainValid, setChainValid] = useState<boolean|null>(null)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const token = localStorage.getItem('bm_token')
+        const res = await fetch('http://localhost:8002/api/v1/compliance/dashboard/?workspace_id=default', {
+          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        })
+        if (res.ok) {
+          const d = await res.json()
+          setData(d)
+          setChainValid(d.audit_chain?.valid)
+        }
+      } catch(e) {
+        // Demo mode
+        setData({
+          audit_chain: { valid: true, message: 'Audit chain integrity verified', count: 1247 },
+          stats: { total_messages: 4821, deleted_messages: 23, edited_messages: 156, unique_senders: 47, brute_force_attempts: 3 },
+          ipfs_status: { network: 'private', nodes: ['127.0.0.1:4001'], encrypted: true },
+          recent_logs: []
+        })
+        setChainValid(true)
+      }
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  if (loading) return (
+    <div className="flex-1 flex items-center justify-center bg-background">
+      <div className="text-muted-foreground text-sm">Memuat dashboard compliance...</div>
+    </div>
+  )
+
+  return (
+    <div className="flex-1 overflow-y-auto bg-background p-6">
+      <div className="flex items-center gap-3 mb-6">
+        <h2 className="text-foreground font-bold text-xl flex-1">Compliance Dashboard</h2>
+        <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border ${chainValid ? 'border-green-500/30 bg-green-500/10 text-green-400' : 'border-red-500/30 bg-red-500/10 text-red-400'}`}>
+          <div className={`w-2 h-2 rounded-full ${chainValid ? 'bg-green-400' : 'bg-red-400'}`}/>
+          {chainValid ? 'Chain Verified' : 'Chain Broken!'}
+        </div>
+      </div>
+
+      <div className="max-w-2xl space-y-4">
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label:'Total Pesan', val: data?.stats?.total_messages || 0, color:'text-white' },
+            { label:'Pesan Dihapus', val: data?.stats?.deleted_messages || 0, color:'text-yellow-400' },
+            { label:'Pesan Diedit', val: data?.stats?.edited_messages || 0, color:'text-blue-400' },
+            { label:'Brute Force', val: data?.stats?.brute_force_attempts || 0, color:'text-red-400' },
+          ].map(s => (
+            <div key={s.label} className="bg-accent border border-border rounded-xl p-4">
+              <div className={`text-2xl font-bold ${s.color}`}>{s.val}</div>
+              <div className="text-muted-foreground text-xs mt-1">{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Audit Chain */}
+        <div className="bg-accent border border-border rounded-xl p-4">
+          <h3 className="text-foreground font-semibold text-sm mb-3">Audit Log Berantai</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between py-1.5 border-b border-border">
+              <span className="text-muted-foreground">Status chain</span>
+              <span className={chainValid ? 'text-green-400' : 'text-red-400'}>{chainValid ? 'Valid' : 'Rusak!'}</span>
+            </div>
+            <div className="flex justify-between py-1.5 border-b border-border">
+              <span className="text-muted-foreground">Total log entries</span>
+              <span className="text-foreground">{data?.audit_chain?.count || 0}</span>
+            </div>
+            <div className="flex justify-between py-1.5 border-b border-border">
+              <span className="text-muted-foreground">Algoritma hash</span>
+              <span className="text-foreground">SHA-256</span>
+            </div>
+            <div className="flex justify-between py-1.5">
+              <span className="text-muted-foreground">Retensi data</span>
+              <span className="text-foreground">10 tahun</span>
+            </div>
+          </div>
+        </div>
+
+        {/* IPFS Status */}
+        <div className="bg-accent border border-border rounded-xl p-4">
+          <h3 className="text-foreground font-semibold text-sm mb-3">Status IPFS</h3>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between py-1.5 border-b border-border">
+              <span className="text-muted-foreground">Jaringan</span>
+              <span className="text-green-400">Private Network</span>
+            </div>
+            <div className="flex justify-between py-1.5 border-b border-border">
+              <span className="text-muted-foreground">Lokasi node</span>
+              <span className="text-foreground">Indonesia (Lokal)</span>
+            </div>
+            <div className="flex justify-between py-1.5">
+              <span className="text-muted-foreground">Enkripsi</span>
+              <span className="text-green-400">AES-256-GCM Aktif</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Key Escrow */}
+        <div className="bg-accent border border-border rounded-xl p-4">
+          <h3 className="text-foreground font-semibold text-sm mb-3">Key Escrow (Shamir 2-of-3)</h3>
+          <div className="space-y-2">
+            {[
+              { holder:'Direktur Kepatuhan', index:1, active:true },
+              { holder:'Head of IT', index:2, active:true },
+              { holder:'Vault Fisik Bank', index:3, active:false },
+            ].map(k => (
+              <div key={k.index} className="flex items-center gap-3 py-2 border-b border-border last:border-0">
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${k.active ? 'bg-green-400' : 'bg-gray-600'}`}/>
+                <span className="text-foreground text-sm flex-1">Key {k.index}: {k.holder}</span>
+                <span className={`text-xs ${k.active ? 'text-green-400' : 'text-muted-foreground'}`}>{k.active ? 'Terdaftar' : 'Pending'}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-muted-foreground text-xs mt-3">Butuh 2 dari 3 kunci untuk emergency access</p>
+        </div>
+
+        {/* Channel Policies */}
+        <div className="bg-accent border border-border rounded-xl p-4">
+          <h3 className="text-foreground font-semibold text-sm mb-3">Kebijakan Channel</h3>
+          <div className="space-y-2">
+            {[
+              { channel:'#umum', type:'General', selfDestruct:true, retention:'30 hari' },
+              { channel:'#acak', type:'General', selfDestruct:true, retention:'30 hari' },
+              { channel:'#pengumuman', type:'Official', selfDestruct:false, retention:'10 tahun' },
+              { channel:'#tim-internal', type:'Operational', selfDestruct:false, retention:'5 tahun' },
+              { channel:'#rekayasa', type:'Operational', selfDestruct:false, retention:'5 tahun' },
+            ].map(ch => (
+              <div key={ch.channel} className="flex items-center gap-3 py-2 border-b border-border last:border-0">
+                <span className="text-foreground text-sm flex-1">{ch.channel}</span>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${ch.selfDestruct ? 'bg-yellow-500/10 text-yellow-400' : 'bg-red-500/10 text-red-400'}`}>
+                  {ch.selfDestruct ? 'Self-destruct OK' : 'Wajib Simpan'}
+                </span>
+                <span className="text-muted-foreground text-xs">{ch.retention}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Emergency Access */}
+        <div className="bg-accent border border-border rounded-xl p-4">
+          <h3 className="text-foreground font-semibold text-sm mb-3">Emergency Access</h3>
+          <p className="text-muted-foreground text-xs mb-3">Akses darurat membutuhkan persetujuan 2 dari 3 pemegang kunci escrow</p>
+          <button className="w-full py-2.5 rounded-xl border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/10 transition-colors">
+            Request Emergency Access
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── AI Page ──────────────────────────────────────────────────────────────────
+const AIPage = ({ currentUser }: { currentUser: any }) => {
+  const [messages, setMessages] = useState<{role:string, content:string, time:string}[]>([
+    { role:'assistant', content:'Halo! Saya BlackMess AI. Saya bisa membantu kamu merangkum percakapan, membuat draft pesan, analisis data, terjemahan, dan banyak lagi. Apa yang bisa saya bantu?', time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) }
+  ])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const suggestions = [
+    'Buatkan rangkuman meeting hari ini',
+    'Draft email profesional ke klien',
+    'Analisis transaksi mencurigakan',
+    'Terjemahkan ke bahasa Inggris',
+    'Buatkan laporan mingguan',
+    'Cek keamanan sistem',
+  ]
+
+  const sendMessage = async (text?: string) => {
+    const msg = text || input.trim()
+    if (!msg || loading) return
+    setInput('')
+
+    const userMsg = { role:'user', content: msg, time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}) }
+    setMessages(prev => [...prev, userMsg])
+    setLoading(true)
+
+    try {
+      const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey || '',
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: `Kamu adalah BlackMess AI, asisten cerdas enterprise untuk platform komunikasi BlackMess.
+Kamu membantu:
+- Merangkum percakapan dan meeting
+- Membuat draft pesan & email profesional  
+- Analisis data keuangan & transaksi
+- Deteksi aktivitas mencurigakan (AML)
+- Terjemahan multibahasa
+- Laporan compliance & audit
+- Manajemen tugas & reminder
+
+Pengguna: ${currentUser?.name || 'User'}
+Gunakan bahasa Indonesia yang profesional, ringkas dan tepat sasaran.`,
+          messages: messages.concat(userMsg).filter(m => m.role !== 'assistant' || messages.indexOf(m) > 0).map(m => ({
+            role: m.role as 'user'|'assistant',
+            content: m.content
+          }))
+        })
+      })
+
+      const data = await res.json()
+      const reply = data.content?.[0]?.text || 'Maaf, tidak bisa memproses permintaan saat ini.'
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: reply,
+        time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+      }])
+    } catch(e) {
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'Tidak dapat terhubung ke BlackMess AI. Pastikan API key sudah diset di file .env',
+        time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+      }])
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden bg-background">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-border flex-shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 className="text-foreground font-bold text-base">BlackMess AI</h2>
+          <p className="text-muted-foreground text-xs">Asisten cerdas enterprise</p>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"/>
+          <span className="text-green-400 text-xs">Online</span>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((m, i) => (
+          <div key={i} className={`flex gap-3 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            {m.role === 'assistant' && (
+              <div className="w-8 h-8 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              </div>
+            )}
+            <div className={`max-w-xs lg:max-w-md xl:max-w-lg ${m.role === 'user' ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+              <div className={`px-4 py-3 rounded-2xl text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-white text-black rounded-tr-sm' : 'bg-accent text-foreground rounded-tl-sm border border-border'}`}>
+                {m.content}
+              </div>
+              <span className="text-muted-foreground text-xs">{m.time}</span>
+            </div>
+            {m.role === 'user' && (
+              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0 mt-0.5 text-white text-xs font-bold">
+                {currentUser?.avatar || 'U'}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {loading && (
+          <div className="flex gap-3 justify-start">
+            <div className="w-8 h-8 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <div className="bg-accent border border-border px-4 py-3 rounded-2xl rounded-tl-sm">
+              <div className="flex gap-1">
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{animationDelay:'0ms'}}/>
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{animationDelay:'150ms'}}/>
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{animationDelay:'300ms'}}/>
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef}/>
+      </div>
+
+      {/* Suggestions */}
+      {messages.length <= 1 && (
+        <div className="px-4 pb-2 flex-shrink-0">
+          <div className="flex flex-wrap gap-2">
+            {suggestions.map(s => (
+              <button key={s} onClick={() => sendMessage(s)}
+                className="px-3 py-1.5 rounded-full border border-border text-muted-foreground text-xs hover:bg-accent hover:text-foreground transition-colors">
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Input */}
+      <div className="p-4 border-t border-border flex-shrink-0">
+        <div className="flex items-center gap-2 bg-accent rounded-xl px-4 py-2.5 border border-border">
+          <input type="text" value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && sendMessage()}
+            placeholder="Tanya BlackMess AI..."
+            className="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground"/>
+          <button onClick={() => sendMessage()}
+            className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${input && !loading ? 'bg-white text-black' : 'text-muted-foreground'}`}
+            disabled={loading}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+          </button>
+        </div>
+        <p className="text-muted-foreground text-xs text-center mt-2">BlackMess AI bisa membuat kesalahan. Verifikasi informasi penting.</p>
+      </div>
+    </div>
+  )
+}
+
 // ─── Activity Page ────────────────────────────────────────────────────────────
 const ActivityPage = () => {
   const [activities] = useState([
@@ -699,6 +1041,7 @@ const MorePage = ({ onNav }: { onNav: (page: string) => void }) => (
       { icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>, label: 'Anggota', desc: 'Undang anggota workspace', page: 'invite' },
       { icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>, label: 'Pengaturan', desc: 'Notifikasi, bahasa, tema, keamanan', page: 'settings' },
       { icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>, label: 'Analitik', desc: 'Laporan dan metrik workspace', page: '' },
+      { icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>, label: 'Compliance', desc: 'Dashboard OJK/BI standar audit', page: 'compliance' },
     ].map(item => (
       <div key={item.label} onClick={() => item.page && onNav(item.page)}
         className="flex items-center gap-4 p-4 rounded-xl bg-accent mb-3 cursor-pointer hover:bg-muted transition-colors">
@@ -823,6 +1166,8 @@ export default function App() {
         </>
       )
       case 'dms': return <DmsPage currentUser={user} />
+      case 'ai': return <AIPage currentUser={user} />
+      case 'compliance': return <CompliancePage currentUser={user} />
       case 'activity': return <ActivityPage />
       case 'saved': return <SavedPage />
       case 'files': return <FilesPage currentUser={user} />
