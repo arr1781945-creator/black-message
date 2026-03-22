@@ -21,7 +21,7 @@ def aes_gcm_encrypt(key_bytes: bytes, plaintext: bytes, aad: bytes = b"") -> tup
     Returns (ciphertext_b64, nonce_b64, auth_tag_b64).
     Note: AESGCM appends 16-byte tag to ciphertext automatically.
     """
-    assert len(key_bytes) == 32, "AES-256 requires 32-byte key"
+    if not (len(key_bytes) == 32): raise ValueError("AES-256 requires 32-byte key")
     nonce = os.urandom(12)  # 96-bit nonce — GCM standard
     aesgcm = AESGCM(key_bytes)
     ct_with_tag = aesgcm.encrypt(nonce, plaintext, aad or None)

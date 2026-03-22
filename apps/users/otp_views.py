@@ -1,4 +1,4 @@
-import random
+import secrets
 import string
 import hashlib
 import time
@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from .email_service import send_otp_email, send_invite_email
 
 def generate_otp():
-    return ''.join(random.choices(string.digits, k=6))
+    return ''.join(secrets.choice(string.digits) for _ in range(6))
 
 def hash_otp(otp: str, email: str) -> str:
     return hashlib.sha256(f"{otp}{email}".encode()).hexdigest()
