@@ -1902,9 +1902,6 @@ export default function App() {
       <WorkspaceSidebar
         activePage={activePage}
         onPageChange={handlePageChange}
-        currentUser={user}
-        onLogout={() => setUser(null)}
-        onProfile={() => setSubPage('profile')}
       />
       {renderContent()}
     </div>

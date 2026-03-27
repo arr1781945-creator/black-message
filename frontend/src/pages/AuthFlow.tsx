@@ -68,23 +68,30 @@ function LoginStep({ onNext }: { onNext: (user: User, step: Step) => void }) {
   // Handle GitHub OAuth callback
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const code = params.get('code')
-    if (code) {
+    const name = params.get('name')
+    const email = params.get('email')
+    const avatar = params.get('avatar')
+    const error = params.get('error')
+
+    if (error) {
+      setError('Login GitHub gagal! Coba lagi.')
+      window.history.replaceState({}, '', window.location.pathname)
+      return
+    }
+
+    if (name && email) {
       const githubUser = {
-        name: 'GitHub User',
-        email: `github_${code.slice(0,8)}@github.com`,
-        avatar: 'G',
+        name, email,
+        avatar: avatar || name[0].toUpperCase(),
         company: 'github.com'
       }
-      // Simpan ke localStorage
       const stored: any[] = JSON.parse(localStorage.getItem('bm_users')||'[]')
-      if (!stored.find(u => u.email === githubUser.email)) {
-        stored.push({ ...githubUser, pass: code, verified: true, kyc: true, usb: false })
+      if (!stored.find(u => u.email === email)) {
+        stored.push({ ...githubUser, pass: '', verified: true, kyc: true, usb: true })
         localStorage.setItem('bm_users', JSON.stringify(stored))
       }
-      // Bersihkan URL
       window.history.replaceState({}, '', window.location.pathname)
-      onNext(githubUser, 'usb')
+      onNext(githubUser, 'auth')
     }
   }, [])
   const [tab, setTab] = useState<'login'|'register'>('login')
@@ -136,8 +143,6 @@ function LoginStep({ onNext }: { onNext: (user: User, step: Step) => void }) {
           const u = stored.find(u => u.email === email)
           const djangoUser = { name:data.user?.username||email.split('@')[0], email, avatar:email[0].toUpperCase(), company:email.split('@')[1] }
           if (!u||!u.verified) { onNext(djangoUser,'verify-email'); setLoading(false); return }
-          if (!u.kyc) { onNext(djangoUser,'kyc'); setLoading(false); return }
-          if (!u.usb) { onNext(djangoUser,'usb'); setLoading(false); return }
           onNext(djangoUser,'auth'); setLoading(false); return
         } else { setError(data.detail||'Email atau password salah!') }
       } catch(e) {}
@@ -147,7 +152,7 @@ function LoginStep({ onNext }: { onNext: (user: User, step: Step) => void }) {
       if (!u) { setError('Email atau password salah!'); setLoading(false); return }
       const user = { name:u.name, email:u.email, avatar:u.name[0].toUpperCase(), company:u.email.split('@')[1] }
       if (!u.verified) { onNext(user,'verify-email'); setLoading(false); return }
-      if (!u.kyc) { onNext(user,'kyc'); setLoading(false); return }
+      // Skip KYC saat login
       if (!u.usb) { onNext(user,'usb'); setLoading(false); return }
       onNext(user,'auth')
     }
@@ -411,8 +416,6 @@ function USBStep({ user, onComplete }: { user: User, onComplete: (user: User) =>
   const [usb2, setUsb2] = useState(false)
   const [loading1, setLoading1] = useState(false)
   const [loading2, setLoading2] = useState(false)
-  const [dbPass, setDbPass] = useState('')
-  const [dbPassConfirm, setDbPassConfirm] = useState('')
   const [error, setError] = useState('')
 
   const registerUSB = (num: number) => {
@@ -443,15 +446,7 @@ function USBStep({ user, onComplete }: { user: User, onComplete: (user: User) =>
     })
   }
 
-  const handleComplete = () => {
-    if (!dbPass) { setError('Kata sandi database wajib diisi!'); return }
-    if (dbPass.length < 8) { setError('Minimal 8 karakter!'); return }
-    if (dbPass !== dbPassConfirm) { setError('Kata sandi tidak sama!'); return }
-    localStorage.setItem(`bm_dbpass_${user.email}`, btoa(dbPass))
-    const s: any[] = JSON.parse(localStorage.getItem('bm_users')||'[]')
-    localStorage.setItem('bm_users', JSON.stringify(s.map(u => u.email===user.email ? {...u, usb:true} : u)))
-    onComplete(user)
-  }
+
 
   const USBCard = ({ num, registered, loading, onRegister }: any) => (
     <div style={{ background:bgInput, border:`1px solid ${registered ? orange : border}`, borderRadius:12, padding:16, display:'flex', alignItems:'center', gap:12, marginBottom:10 }}>
@@ -485,13 +480,7 @@ function USBStep({ user, onComplete }: { user: User, onComplete: (user: User) =>
         <USBCard num={1} registered={usb1} loading={loading1} onRegister={() => registerUSB(1)}/>
         <USBCard num={2} registered={usb2} loading={loading2} onRegister={() => registerUSB(2)}/>
 
-        <div style={{ marginTop:16 }}>
-          <label style={{ color:'#FFFFFF', fontSize:13, display:'block', marginBottom:6 }}>Kata sandi database</label>
-          <input style={{ ...inputStyle, marginBottom:10 }} type="password" placeholder="Min. 8 karakter" value={dbPass} onChange={e=>setDbPass(e.target.value)}/>
-          <input style={inputStyle} type="password" placeholder="Konfirmasi kata sandi" value={dbPassConfirm} onChange={e=>setDbPassConfirm(e.target.value)}/>
-        </div>
-
-        <button onClick={handleComplete} style={{ ...btnPrimary, marginTop:16, opacity:(!usb1||!dbPass)?0.6:1 }}>
+                <button onClick={handleComplete} style={{ ...btnPrimary, marginTop:16, opacity:1 }}>
           Selesai & Masuk Dashboard
         </button>
         <button onClick={() => onComplete(user)} style={{ ...btnSecondary, marginTop:8 }}>
