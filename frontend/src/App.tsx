@@ -1851,13 +1851,21 @@ const ProfilePage = ({ user, onLogout, onBack }: { user: any, onLogout: () => vo
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
 export default function App() {
-  const [user, setUser] = useState<User|null>(null)
+  const [user, setUser] = useState<User|null>(() => {
+    try {
+      const saved = localStorage.getItem('bm_current_user')
+      return saved ? JSON.parse(saved) : null
+    } catch { return null }
+  })
   const [activePage, setActivePage] = useState('home')
   const [activeChannel, setActiveChannel] = useState('umum')
   const [subPage, setSubPage] = useState('')
   const [showVideoCall, setShowVideoCall] = useState(false)
 
-  if (!user) return <AuthFlow onComplete={setUser} />
+  if (!user) return <AuthFlow onComplete={(u) => {
+    localStorage.setItem('bm_current_user', JSON.stringify(u))
+    setUser(u)
+  }} />
 
   if (showVideoCall && user) return <VideoCall user={user} onClose={() => setShowVideoCall(false)} />
 
