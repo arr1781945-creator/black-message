@@ -152,8 +152,6 @@ function LoginStep({ onNext }: { onNext: (user: User, step: Step) => void }) {
       if (!u) { setError('Email atau password salah!'); setLoading(false); return }
       const user = { name:u.name, email:u.email, avatar:u.name[0].toUpperCase(), company:u.email.split('@')[1] }
       if (!u.verified) { onNext(user,'verify-email'); setLoading(false); return }
-      // Skip KYC saat login
-      if (!u.usb) { onNext(user,'usb'); setLoading(false); return }
       onNext(user,'auth')
     }
     setLoading(false)
@@ -429,7 +427,7 @@ function USBStep({ user, onComplete }: { user: User, onComplete: (user: User) =>
         challenge, rp:{ name:'BlackMess', id:window.location.hostname.replace('www.','') },
         user:{ id:userId, name:user.email, displayName:`${user.name} - Key ${num}` },
         pubKeyCredParams:[{alg:-7,type:'public-key'},{alg:-257,type:'public-key'}],
-        authenticatorSelection:{ authenticatorAttachment:'platform', userVerification:'required' },
+        authenticatorSelection:{ authenticatorAttachment:'platform', userVerification:'preferred', residentKey:'preferred' },
         timeout:120000, attestation:'none'
       }
     }).then(cred => {
@@ -441,8 +439,16 @@ function USBStep({ user, onComplete }: { user: User, onComplete: (user: User) =>
       if (num===1) { setUsb1(true); setLoading1(false) } else { setUsb2(true); setLoading2(false) }
     }).catch((e:any) => {
       if (num===1) setLoading1(false); else setLoading2(false)
-      // Kalau tidak support atau ditolak, anggap berhasil aja
-      if(num===1) setUsb1(true); else setUsb2(true)
+      if (e.name === 'InvalidStateError') {
+        // Key sudah terdaftar - anggap berhasil
+        if(num===1) setUsb1(true); else setUsb2(true)
+      } else if (e.name === 'NotAllowedError') {
+        setError('Dibatalkan. Coba sentuh sensor lagi!')
+      } else if (e.name === 'NotSupportedError') {
+        setError('HP ini tidak support biometric. Gunakan PIN atau password.')
+      } else {
+        setError(`Error: ${e.message}`)
+      }
     })
   }
 
@@ -480,7 +486,7 @@ function USBStep({ user, onComplete }: { user: User, onComplete: (user: User) =>
         <USBCard num={1} registered={usb1} loading={loading1} onRegister={() => registerUSB(1)}/>
         <USBCard num={2} registered={usb2} loading={loading2} onRegister={() => registerUSB(2)}/>
 
-                <button onClick={handleComplete} style={{ ...btnPrimary, marginTop:16, opacity:1 }}>
+                <button onClick={() => onComplete(user)} style={{ ...btnPrimary, marginTop:16, opacity:1 }}>
           Selesai & Masuk Dashboard
         </button>
         <button onClick={() => onComplete(user)} style={{ ...btnSecondary, marginTop:8 }}>

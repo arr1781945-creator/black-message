@@ -5,7 +5,7 @@
 @layer base {
   :root {
     --background: 0 0% 11%;
-    --foreground: 0 0% 95%;
+    --foreground: 0 0% 98%;
     --border: 0 0% 20%;
     --input: 0 0% 18%;
     --ring: 197 91% 58%;
@@ -34,3 +34,47 @@
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+.light {
+  --background: 0 0% 100% !important;
+  --foreground: 0 0% 5% !important;
+  --border: 0 0% 85% !important;
+  --input: 0 0% 90% !important;
+  --muted: 0 0% 95% !important;
+  --muted-foreground: 0 0% 35% !important;
+  --accent: 0 0% 95% !important;
+  --accent-foreground: 0 0% 5% !important;
+  --sidebar-background: 0 0% 95% !important;
+  --sidebar-foreground: 0 0% 5% !important;
+  --sidebar-accent: 0 0% 88% !important;
+  --sidebar-border: 0 0% 80% !important;
+}
+
+.light body {
+  background-color: #ffffff !important;
+  color: #0a0a0a !important;
+}
+
+
+
+.light .text-gray-300,
+.light .text-gray-400,
+.light .text-gray-500 {
+  color: #444444 !important;
+}
+
+.light .bg-background {
+  background-color: #ffffff !important;
+}
+
+.light .bg-accent {
+  background-color: #f3f4f6 !important;
+}
+
+.light .bg-muted {
+  background-color: #f3f4f6 !important;
+}
+
+.light .border-border {
+  border-color: #e5e7eb !important;
+}

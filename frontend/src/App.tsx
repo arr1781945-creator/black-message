@@ -1,9 +1,9 @@
-import { useAuth, useUser, SignIn, SignUp } from '@clerk/react'
 import { useState, useRef, useEffect } from 'react'
 import { AuthFlow } from './pages/AuthFlow'
 import { WorkspaceSidebar } from './components/workspace-sidebar'
 import { ChannelSidebar } from './components/channel-sidebar'
 import { ChatArea } from './components/chat-area'
+import { VideoCall } from './components/VideoCall'
 
 interface User { name: string; email: string; avatar: string; company: string }
 
@@ -430,8 +430,7 @@ const InvitePage = ({ user }: { user: User }) => {
   const handleInvite = async () => {
     if (!email.trim()) { setError('Masukkan email!'); return }
     if (!email.includes('@')) { setError('Email tidak valid!'); return }
-    const personal = ['gmail.com','yahoo.com','hotmail.com','outlook.com']
-    if (personal.includes(email.split('@')[1])) { setError('Gunakan email perusahaan!'); return }
+
     const link = `http://localhost:3003/invite?ref=${btoa(email)}&from=${btoa(user.email)}`
     try {
       const res = await fetch('https://black-message-production.up.railway.app/api/v1/auth/invite/send/', {
@@ -462,7 +461,7 @@ const InvitePage = ({ user }: { user: User }) => {
   return (
     <div className="flex-1 overflow-y-auto bg-background p-6">
       <h2 className="text-foreground font-bold text-xl mb-2">Anggota</h2>
-      <p className="text-muted-foreground text-sm mb-6">Undang anggota baru via email perusahaan</p>
+      <p className="text-muted-foreground text-sm mb-6">Undang anggota baru via email</p>
       <div className="max-w-md">
         <div className="bg-accent border border-border rounded-xl p-4 mb-6">
           <h3 className="text-foreground font-semibold text-sm mb-3">Kirim undangan</h3>
@@ -470,7 +469,7 @@ const InvitePage = ({ user }: { user: User }) => {
           <div className="flex gap-2">
             <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError('') }}
               onKeyDown={e => e.key==='Enter' && handleInvite()}
-              placeholder="nama@perusahaan.com"
+              placeholder="nama@gmail.com atau nama@perusahaan.com"
               className="flex-1 px-3 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm outline-none focus:border-white"/>
             <button onClick={handleInvite} className="px-4 py-2.5 rounded-lg bg-background text-white font-bold text-sm flex-shrink-0">Kirim</button>
           </div>
@@ -1102,7 +1101,7 @@ const AppsPage = () => {
         {apps.map(app => (
           <div key={app.name} className="flex items-center gap-4 p-4 rounded-xl bg-accent border border-border">
             <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center flex-shrink-0 p-1.5">
-              <img src={app.logo} alt={app.name} className="w-full h-full object-contain" style={{filter: ['GitHub','Jira','Notion','Trello','Slack'].includes(app.name) ? 'invert(1)' : 'none'}}/>
+              <img src={app.logo} alt={app.name} className="w-full h-full object-contain" style={{filter: ['GitHub','Notion'].includes(app.name) ? 'invert(1)' : 'none'}}/>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-foreground font-semibold text-sm">{app.name}</div>
@@ -1254,8 +1253,29 @@ const ProfilePage = ({ user, onLogout, onBack }: { user: any, onLogout: () => vo
     setTheme(t)
     localStorage.setItem('bm_theme', t)
     const root = document.documentElement
-    if (t === 'light') { root.classList.add('light'); root.classList.remove('dark') }
-    else { root.classList.remove('light'); root.classList.add('dark') }
+    if (t === 'light') {
+      root.classList.add('light')
+      root.classList.remove('dark')
+      document.body.style.backgroundColor = '#ffffff'
+      document.body.style.color = '#000000'
+      document.documentElement.style.setProperty('--background', '0 0% 100%')
+      document.documentElement.style.setProperty('--foreground', '0 0% 0%')
+      document.documentElement.style.setProperty('--accent', '0 0% 95%')
+      document.documentElement.style.setProperty('--muted', '0 0% 95%')
+      document.documentElement.style.setProperty('--border', '0 0% 85%')
+      document.documentElement.style.setProperty('--muted-foreground', '0 0% 30%')
+    } else {
+      root.classList.remove('light')
+      root.classList.add('dark')
+      document.body.style.backgroundColor = '#1a1a1a'
+      document.body.style.color = '#ffffff'
+      document.documentElement.style.setProperty('--background', '0 0% 10%')
+      document.documentElement.style.setProperty('--foreground', '0 0% 100%')
+      document.documentElement.style.setProperty('--accent', '0 0% 16%')
+      document.documentElement.style.setProperty('--muted', '0 0% 16%')
+      document.documentElement.style.setProperty('--border', '0 0% 20%')
+      document.documentElement.style.setProperty('--muted-foreground', '0 0% 55%')
+    }
   }
 
   const tabs = [
@@ -1265,12 +1285,10 @@ const ProfilePage = ({ user, onLogout, onBack }: { user: any, onLogout: () => vo
     { id:'pesan', label:'Pesan & Media' },
     { id:'privasi', label:'Privasi' },
     { id:'saluran', label:'Saluran & Ruang' },
-    { id:'keamanan', label:'Keamanan' },
     { id:'bahasa', label:'Bahasa & Wilayah' },
     { id:'admin', label:'Administrasi' },
     { id:'integrasi', label:'Integrasi' },
     { id:'pintasan', label:'Pintasan' },
-    { id:'tentang', label:'Tentang' },
   ]
 
   return (
@@ -1449,9 +1467,9 @@ const ProfilePage = ({ user, onLogout, onBack }: { user: any, onLogout: () => vo
 
             <Section title="Tema">
               <div className="grid grid-cols-3 gap-2 mb-3">
-                {[{val:'dark',label:'🌙 Gelap'},{val:'light',label:'☀️ Terang'},{val:'system',label:'⚙️ Sistem'}].map(t => (
+                {[{val:'dark',label:<span className="flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>Gelap</span>},{val:'light',label:<span className="flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>Terang</span>},{val:'system',label:<span className="flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Sistem</span>}].map(t => (
                   <button key={t.val} onClick={() => applyTheme(t.val)}
-                    className={`py-2.5 rounded-lg text-sm font-medium transition-colors ${theme===t.val ? 'bg-[#4A154B] text-white' : 'bg-muted text-gray-300 border border-border hover:bg-accent'}`}>
+                    className={`py-2.5 rounded-lg text-sm font-medium transition-colors ${theme===t.val ? 'bg-[#4A154B] text-white' : 'bg-muted text-foreground border border-border hover:bg-accent'}`}>
                     {t.label}
                   </button>
                 ))}
@@ -1740,11 +1758,11 @@ const ProfilePage = ({ user, onLogout, onBack }: { user: any, onLogout: () => vo
                 {name:'Jira', desc:'Manajemen proyek & tiket', logo:'https://upload.wikimedia.org/wikipedia/commons/8/8a/Jira_Logo.svg', url:'https://jira.atlassian.com'},
                 {name:'Trello', desc:'Manajemen tugas visual', logo:'https://upload.wikimedia.org/wikipedia/en/8/8c/Trello_logo.svg', url:'https://trello.com'},
                 {name:'Notion', desc:'Dokumentasi tim', logo:'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png', url:'https://notion.so'},
-                {name:'Slack', desc:'Import data dari Slack', logo:'https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg', url:'https://slack.com'},
+                {name:'Slack', desc:'Import data dari Slack', logo:'https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg', url:'https://slack.com'},
               ].map(app => (
                 <div key={app.name} className="flex items-center gap-4 p-4 rounded-xl bg-accent border border-border">
-                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center flex-shrink-0 p-1.5">
-                    <img src={app.logo} alt={app.name} className="w-full h-full object-contain" style={{filter: ['GitHub','Jira','Notion','Trello','Slack'].includes(app.name) ? 'invert(1)' : 'none'}}/>
+                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center flex-shrink-0 p-1.5" style={{background: theme==='light' ? '#f3f4f6' : '#ffffff'}}>
+                    <img src={app.logo} alt={app.name} className="w-full h-full object-contain" style={{filter: ['GitHub','Notion'].includes(app.name) ? 'invert(1)' : 'none'}}/>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-white font-semibold text-sm">{app.name}</div>
@@ -1862,12 +1880,14 @@ export default function App() {
   const [subPage, setSubPage] = useState('')
   const [showVideoCall, setShowVideoCall] = useState(false)
 
+
+
   if (!user) return <AuthFlow onComplete={(u) => {
     localStorage.setItem('bm_current_user', JSON.stringify(u))
     setUser(u)
   }} />
 
-  if (showVideoCall && user) return <VideoCall user={user} onClose={() => setShowVideoCall(false)} />
+  if (showVideoCall && user) return <VideoCall user={user!} onClose={() => setShowVideoCall(false)} />
 
   const handleNav = (page: string) => {
     if (page === 'videocall') { setShowVideoCall(true); return }
@@ -1882,10 +1902,10 @@ export default function App() {
 
   const renderContent = () => {
     try {
-    if (subPage === 'profile') return <ProfilePage user={user} onLogout={() => setUser(null)} onBack={() => setSubPage('')} />
+    if (subPage === 'profile') return <ProfilePage user={user!} onLogout={() => { setUser(null); localStorage.removeItem('bm_current_user') }} onBack={() => setSubPage('')} />
     if (subPage === 'vault') return <VaultPage />
     if (subPage === 'settings') { setSubPage('profile'); return null }
-    if (subPage === 'invite') return <InvitePage user={user} />
+    if (subPage === 'invite') return <InvitePage user={user!} />
 
     switch(activePage) {
       case 'home': return (

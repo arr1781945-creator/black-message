@@ -1,23 +1,24 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
 import './index.css'
+import App from './App.tsx'
 
-// Load saved theme
 const savedTheme = localStorage.getItem('bm_theme') || 'dark'
 const root = document.documentElement
-if (savedTheme === 'light') {
-  root.classList.add('light')
-} else if (savedTheme === 'system') {
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  if (!prefersDark) root.classList.add('light')
+if (savedTheme === 'light') root.classList.add('light')
+
+window.onerror = function(msg, src, line, col, err) {
+  document.body.innerHTML = `<div style="color:white;background:#1a1a1a;padding:20px;font-family:monospace;">
+    <h2 style="color:red">ERROR: ${msg}</h2>
+    <p>Line: ${line}</p>
+    <p>${err?.stack || ''}</p>
+    <button onclick="localStorage.clear();location.reload()" style="margin-top:16px;padding:10px 20px;background:#4A154B;color:white;border:none;border-radius:8px;cursor:pointer">Reset & Reload</button>
+  </div>`
+  return true
 }
 
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    
-      <App />
-    
-  </React.StrictMode>,
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
 )
