@@ -3,7 +3,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-FROM_EMAIL = 'noreply@blackmess.app'
+FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'chudorifirman@gmail.com')
 
 def send_otp_email(to_email: str, otp: str, name: str = '') -> bool:
     message = Mail(
