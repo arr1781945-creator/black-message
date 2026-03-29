@@ -165,3 +165,9 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3003',
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF
+CSRF_TRUSTED_ORIGINS = [
+    'https://black-message-production.up.railway.app',
+    'https://black-message.vercel.app',
+]
