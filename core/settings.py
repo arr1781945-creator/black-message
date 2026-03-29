@@ -146,12 +146,7 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = os.environ.get('FRONTEND_URL', 'https://blac
 SOCIAL_AUTH_GITHUB_EXTRA_DATA = [('login', 'username'), ('email', 'email')]
 
 # ── SendGrid Email ─────────────────────────────────────────────────────────────
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'apikey'
-EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY', '')
+# Email via Railway env vars
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@blackmess.app')
 
 # ── FIDO2/WebAuthn ─────────────────────────────────────────────────────────────
@@ -171,3 +166,12 @@ CSRF_TRUSTED_ORIGINS = [
     'https://black-message-production.up.railway.app',
     'https://black-message.vercel.app',
 ]
+
+# Email Settings - Gmail SMTP
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@blackmess.app')
