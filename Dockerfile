@@ -29,3 +29,4 @@ RUN python manage.py collectstatic --noinput || true
 EXPOSE 8000
 
 CMD sh -c 'python manage.py migrate --no-input && gunicorn core.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2'
+# liboqs enabled Mon Mar 30 11:18:57 WIT 2026
