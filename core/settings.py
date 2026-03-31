@@ -206,3 +206,6 @@ SOCIAL_AUTH_GITHUB_CALLBACK_URL = 'https://black-message-production.up.railway.a
 
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Tambah middleware HTTPS paksa di posisi pertama
+MIDDLEWARE.insert(0, 'apps.users.middleware.ForceHTTPSMiddleware')
