@@ -133,7 +133,8 @@ INSTALLED_APPS += [
     'social_django',
 ]
 
-    'social_core.backends.github.GithubOAuth2',
+AUTHENTICATION_BACKENDS = [
+    'apps.users.github_backend.GithubOAuth2HTTPS',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -176,6 +177,7 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@blackmess.app
 # Clerk Authentication
 CLERK_SECRET_KEY = os.environ.get('CLERK_SECRET_KEY', '')
 
+SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',
     'social_core.pipeline.social_auth.auth_allowed',
