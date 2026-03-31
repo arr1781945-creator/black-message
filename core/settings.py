@@ -203,3 +203,6 @@ SOCIAL_AUTH_NEW_USER_REDIRECT_URL = 'https://black-message-production.up.railway
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 
 SOCIAL_AUTH_GITHUB_CALLBACK_URL = 'https://black-message-production.up.railway.app/oauth/complete/github/'
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
