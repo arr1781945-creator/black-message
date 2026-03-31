@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from .models import BankUser, LoginSession, UserPublicKey
-from .serializers import BankUserSerializer as UserSerializer, UserPublicKeySerializer as PublicKeySerializer
+from .serializers import BankUserSerializer as UserSerializer, UserPublicKeySerializer as PublicKeySerializer, UserProfileSerializer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -73,6 +73,28 @@ class MeProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        # Update BankUser fields
+        user = request.user
+        user_data = {k: v for k, v in request.data.items() 
+                     if k in ["first_name", "last_name", "department", "avatar_ipfs_cid"]}
+        if user_data:
+            for k, v in user_data.items():
+                setattr(user, k, v)
+            user.save(update_fields=list(user_data.keys()))
+
+        # Update UserProfile fields
+        profile_data = {k: v for k, v in request.data.items()
+                        if k in ["title", "bio_encrypted", "timezone", "locale", "notification_prefs", "theme"]}
+        if profile_data:
+            from .models import UserProfile
+            profile, _ = UserProfile.objects.get_or_create(user=user)
+            for k, v in profile_data.items():
+                setattr(profile, k, v)
+            profile.save(update_fields=list(profile_data.keys()))
+
+        return Response(UserSerializer(user).data)
 
 
 class ChangePasswordView(APIView):
