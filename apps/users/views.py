@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from .models import BankUser, LoginSession, UserPublicKey
-from .serializers import BankUserSerializer as UserSerializer, UserPublicKeySerializer as PublicKeySerializer, UserProfileSerializer
+from .serializers import BankUserSerializer as UserSerializer, BankUserCreateSerializer, UserPublicKeySerializer as PublicKeySerializer, UserProfileSerializer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ class LogoutView(APIView):
 
 class RegisterView(generics.CreateAPIView):
     permission_classes = [permissions.AllowAny]
-    serializer_class = UserSerializer
+    serializer_class = BankUserCreateSerializer
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
