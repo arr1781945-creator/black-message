@@ -198,3 +198,6 @@ SOCIAL_AUTH_GITHUB_CALLBACK_URL = 'https://black-message-production.up.railway.a
 # Override redirect ke oauth_callback dulu untuk inject JWT
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'https://black-message-production.up.railway.app/oauth/done/'
 SOCIAL_AUTH_NEW_USER_REDIRECT_URL = 'https://black-message-production.up.railway.app/oauth/done/'
+
+# Force HTTPS untuk OAuth
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
