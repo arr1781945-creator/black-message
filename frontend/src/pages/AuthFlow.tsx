@@ -1,4 +1,5 @@
 import { loginWithGitHub, handleGitHubCallback } from '../lib/github-auth'
+import { login, register, sendOTP, verifyOTP, setTokens } from '../lib/api'
 import * as OTPAuth from 'otpauth'
 import QRCode from 'react-qr-code'
 import { useState, useEffect } from 'react'
@@ -71,6 +72,7 @@ function LoginStep({ onNext }: { onNext: (user: User, step: Step) => void }) {
     const name = params.get('name')
     const email = params.get('email')
     const avatar = params.get('avatar')
+    const provider = params.get('provider')
     const error = params.get('error')
 
     if (error) {
@@ -79,14 +81,14 @@ function LoginStep({ onNext }: { onNext: (user: User, step: Step) => void }) {
       return
     }
 
-    if (name && email) {
+    if (name && email && provider) {
       const githubUser = {
         name, email,
         avatar: avatar || name[0].toUpperCase(),
-        company: 'github.com'
+        company: email.split('@')[1] || 'github.com'
       }
       const stored: any[] = JSON.parse(localStorage.getItem('bm_users')||'[]')
-      if (!stored.find(u => u.email === email)) {
+      if (!stored.find((u: any) => u.email === email)) {
         stored.push({ ...githubUser, pass: '', verified: true, kyc: true, usb: true })
         localStorage.setItem('bm_users', JSON.stringify(stored))
       }

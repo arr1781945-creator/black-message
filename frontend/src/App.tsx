@@ -217,7 +217,7 @@ const VideoCallPage = ({ user, onClose }: { user: User, onClose: () => void }) =
 const VaultPage = () => {
   const [unlocked, setUnlocked] = useState(false)
   const [pass, setPass] = useState('')
-  const [error, setError] = useState('')
+  const [vaultError, setVaultError] = useState('')
   const [items, setItems] = useState([
     { id:1, name:'KYC Records', desc:'847 data terverifikasi', type:'kyc', locked:true },
     
@@ -227,7 +227,7 @@ const VaultPage = () => {
 
   const unlock = () => {
     if (pass.length < 8) { setError('Password salah!'); return }
-    setUnlocked(true); setError('')
+    setUnlocked(true); setVaultError('')
   }
 
   if (!unlocked) return (
@@ -445,7 +445,7 @@ const InvitePage = ({ user }: { user: User }) => {
       })
       if (res.ok) {
         setSent(prev => [...prev, email])
-        setEmail(''); setError('')
+        setEmail(''); setVaultError('')
         alert(`Undangan berhasil dikirim ke ${email}!`)
       } else {
         setError('Gagal kirim email, coba lagi!')
@@ -453,7 +453,7 @@ const InvitePage = ({ user }: { user: User }) => {
     } catch(e) {
       // Fallback
       setSent(prev => [...prev, email])
-      setEmail(''); setError('')
+      setEmail(''); setVaultError('')
       alert(`Demo mode: Link undangan untuk ${email}:\n${link}`)
     }
   }
@@ -467,7 +467,7 @@ const InvitePage = ({ user }: { user: User }) => {
           <h3 className="text-foreground font-semibold text-sm mb-3">Kirim undangan</h3>
           {error && <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-2 text-red-400 text-xs mb-3">{error}</div>}
           <div className="flex gap-2">
-            <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError('') }}
+            <input type="email" value={email} onChange={e => { setEmail(e.target.value); setVaultError('') }}
               onKeyDown={e => e.key==='Enter' && handleInvite()}
               placeholder="nama@gmail.com atau nama@perusahaan.com"
               className="flex-1 px-3 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm outline-none focus:border-white"/>
@@ -1157,10 +1157,11 @@ const ProfilePage = ({ user, onLogout, onBack }: { user: any, onLogout: () => vo
   const [saved, setSaved] = useState(false)
 
   // Profil
-  const [name, setName] = useState(user?.name || '')
-  const [title, setTitle] = useState('')
-  const [dept, setDept] = useState('')
-  const [phone, setPhone] = useState('')
+  const [name, setName] = useState(() => localStorage.getItem('bm_profile_name') || user?.name || '')
+  const [titleJob, setTitleJob] = useState(() => localStorage.getItem('bm_profile_title') || '')
+  const [dept, setDept] = useState(() => localStorage.getItem('bm_profile_dept') || '')
+  const [phone, setPhone] = useState(() => localStorage.getItem('bm_profile_phone') || '')
+
   const [timezone, setTimezone] = useState('WIB')
   const [status, setStatus] = useState('online')
   const [customStatus, setCustomStatus] = useState('')
@@ -1339,7 +1340,7 @@ const ProfilePage = ({ user, onLogout, onBack }: { user: any, onLogout: () => vo
               </div>
               {[
                 ['Nama tampilan', name, setName, 'text', 'Nama kamu di workspace'],
-                ['Jabatan', title, setTitle, 'text', 'Contoh: Senior Engineer'],
+                ['Jabatan', titleJob, setTitleJob, 'text', 'Contoh: Senior Engineer'],
                 ['Departemen', dept, setDept, 'text', 'Contoh: Engineering'],
                 ['Nomor telepon', phone, setPhone, 'tel', '+62 812 xxxx xxxx'],
               ].map(([label, val, setter, type, placeholder]: any) => (
@@ -1391,7 +1392,14 @@ const ProfilePage = ({ user, onLogout, onBack }: { user: any, onLogout: () => vo
               </Row>
             </Section>
 
-            <button onClick={() => setSaved(true)}
+            <button onClick={() => {
+                localStorage.setItem('bm_profile_name', name)
+                localStorage.setItem('bm_profile_title', titleJob || '')
+                localStorage.setItem('bm_profile_dept', dept || '')
+                localStorage.setItem('bm_profile_phone', phone || '')
+                setSaved(true)
+                setTimeout(() => setSaved(false), 2000)
+              }}
               className="w-full py-2.5 rounded-xl bg-[#4A154B] text-white font-bold text-sm hover:bg-[#3d1040]">
               {saved ? '✓ Tersimpan' : 'Simpan Perubahan'}
             </button>
@@ -1668,6 +1676,21 @@ const ProfilePage = ({ user, onLogout, onBack }: { user: any, onLogout: () => vo
                   <option value="ms">🇲🇾 Bahasa Melayu</option>
                   <option value="zh">🇨🇳 中文</option>
                   <option value="ja">🇯🇵 日本語</option>
+                  <option value="ko">🇰🇷 한국어</option>
+                  <option value="fr">🇫🇷 Français</option>
+                  <option value="de">🇩🇪 Deutsch</option>
+                  <option value="es">🇪🇸 Español</option>
+                  <option value="pt">🇧🇷 Português</option>
+                  <option value="ru">🇷🇺 Русский</option>
+                  <option value="hi">🇮🇳 हिन्दी</option>
+                  <option value="tr">🇹🇷 Türkçe</option>
+                  <option value="it">🇮🇹 Italiano</option>
+                  <option value="nl">🇳🇱 Nederlands</option>
+                  <option value="pl">🇵🇱 Polski</option>
+                  <option value="sv">🇸🇪 Svenska</option>
+                  <option value="th">🇹🇭 ภาษาไทย</option>
+                  <option value="vi">🇻🇳 Tiếng Việt</option>
+                  <option value="fa">🇮🇷 فارسی</option>
                 </select>
               </Row>
             </Section>
@@ -1882,7 +1905,8 @@ export default function App() {
 
 
 
-  if (!user) return <AuthFlow onComplete={(u) => {
+
+    if (!user) return <AuthFlow onComplete={(u) => {
     localStorage.setItem('bm_current_user', JSON.stringify(u))
     setUser(u)
   }} />
@@ -1901,7 +1925,6 @@ export default function App() {
   }
 
   const renderContent = () => {
-    try {
     if (subPage === 'profile') return <ProfilePage user={user!} onLogout={() => { setUser(null); localStorage.removeItem('bm_current_user') }} onBack={() => setSubPage('')} />
     if (subPage === 'vault') return <VaultPage />
     if (subPage === 'settings') { setSubPage('profile'); return null }
@@ -1923,15 +1946,6 @@ export default function App() {
       case 'apps': return <AppsPage />
       case 'more': return <MorePage onNav={handleNav} />
       default: return <><ChannelSidebar onChannelChange={ch => setActiveChannel(ch)} /><ChatArea key={activeChannel} channel={activeChannel} currentUser={user} onVideoCall={() => setShowVideoCall(true)} onProfile={() => setSubPage("profile")} /></>
-    }
-    } catch(e: any) {
-      return <div style={{color:'white',padding:20,background:'#1a1a1a',minHeight:'100vh'}}>
-        <h2>Error: {e?.message}</h2>
-        <button onClick={() => { localStorage.clear(); window.location.reload() }} 
-          style={{padding:'10px 20px',background:'#4A154B',color:'white',border:'none',borderRadius:8,cursor:'pointer',marginTop:16}}>
-          Reset & Login Ulang
-        </button>
-      </div>
     }
   }
 

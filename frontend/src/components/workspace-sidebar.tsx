@@ -26,8 +26,7 @@ export function WorkspaceSidebar({ activePage, onPageChange }: { activePage: str
             key={workspace.id}
             onClick={() => setActiveWorkspace(workspace.id)}
             className={cn(
-              "w-9 h-9 rounded-lg flex items-center justify-center text-sm font-semibold transition-all",
-              workspace.color,
+              "w-9 h-9 rounded-lg flex items-center justify-center transition-all bg-[#1a1a1a] border border-[#333]",
               activeWorkspace === workspace.id
                 ? "ring-2 ring-white ring-offset-2 ring-offset-[#0d0d0d]"
                 : "opacity-70 hover:opacity-100"

@@ -4,8 +4,8 @@ import { HashIcon, StarIcon, UsersIcon, MoreIcon, PaperclipIcon, SmileIcon, Send
 
 const EMOJIS = ['😀','😂','🥰','😎','🤔','😴','🥳','😭','🔥','💪','👍','👎','❤️','💯','🎉','✅','⚠️','🚀','💻','📱']
 const REACTIONS = ['👍','❤️','😂','😮','😢','🔥']
-const WS_URL = 'ws://localhost:8002/ws/chat'
-const CHANNEL_DATA: Record<string, any[]> = {}
+import { createWebSocket, fetchMessages, API_URL, getToken } from '../lib/api'
+
 
 export function ChatArea({ channel = "umum", currentUser, onVideoCall, onProfile }: {
   channel?: string
@@ -32,7 +32,20 @@ export function ChatArea({ channel = "umum", currentUser, onVideoCall, onProfile
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    setMessages(CHANNEL_DATA[channel] || [])
+    // Load messages dari backend
+    fetchMessages(channel).then(msgs => {
+      if (Array.isArray(msgs)) {
+        setMessages(msgs.map((m: any) => ({
+          id: m.id,
+          user: m.sender_name || m.sender || 'Unknown',
+          avatar: (m.sender_name || 'U')[0].toUpperCase(),
+          color: 'from-gray-700 to-gray-800',
+          time: new Date(m.created_at).toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}),
+          content: m.content || m.message || '',
+          replies: [], reactions: {}, pinned: false,
+        })))
+      }
+    })
     connectWS()
     setActiveThread(null)
     setShowSearch(false)
