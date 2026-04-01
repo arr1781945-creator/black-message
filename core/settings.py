@@ -135,6 +135,7 @@ INSTALLED_APPS += [
 
 AUTHENTICATION_BACKENDS = [
     'apps.users.github_backend.GithubOAuth2HTTPS',
+    'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -200,6 +201,7 @@ SOCIAL_AUTH_PIPELINE = (
 # ── GitHub OAuth (FINAL FIX) ──────────────────────────────────────────────────
 AUTHENTICATION_BACKENDS = [
     'apps.users.github_backend.GithubOAuth2HTTPS',
+    'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 SOCIAL_AUTH_GITHUB_KEY = os.environ.get('SOCIAL_AUTH_GITHUB_KEY', '')
@@ -232,3 +234,9 @@ CHANNEL_LAYERS = {
     },
 }
 ASGI_APPLICATION = "core.asgi.application"
+
+# ── Google OAuth ───────────────────────────────────────────────────────────────
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get('GOOGLE_CLIENT_ID', '')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
+SOCIAL_AUTH_GOOGLE_OAUTH2_AUTH_EXTRA_ARGUMENTS = {'access_type': 'online'}
