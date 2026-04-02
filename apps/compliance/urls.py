@@ -5,6 +5,7 @@ from .views import (
     SecureFileLinkViewSet, DLPRuleViewSet, HelpdeskTicketViewSet,
     InstitutionBadgeViewSet,
 )
+
 router = DefaultRouter()
 router.register(r'ojk-incidents', OJKIncidentViewSet, basename='ojk-incident')
 router.register(r'info-barriers', InformationBarrierViewSet, basename='info-barrier')
@@ -13,4 +14,5 @@ router.register(r'secure-links', SecureFileLinkViewSet, basename='secure-link')
 router.register(r'dlp-rules', DLPRuleViewSet, basename='dlp-rule')
 router.register(r'helpdesk', HelpdeskTicketViewSet, basename='helpdesk')
 router.register(r'institution-badges', InstitutionBadgeViewSet, basename='institution-badge')
-urlpatterns = [path('', include(router.urls))]
+
+urlpatterns = router.urls
