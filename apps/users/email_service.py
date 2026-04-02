@@ -2,7 +2,7 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Content
 
-FROM_EMAIL = 'blackmessage312415@gmail.com'
+FROM_EMAIL = 'noreply@blackmess.app'
 FROM_NAME = 'BlackMess'
 
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '')
@@ -74,7 +74,7 @@ def _template(content_html: str, plain_text: str) -> tuple:
   <tr>
     <td style="background:#0d0d15;padding:24px 40px;border-top:1px solid #1e1e2e;text-align:center;">
       <p style="color:#374151;font-size:12px;margin:0 0 6px;">
-        © 2026 BlackMess Enterprise · Ternate, Maluku Utara, Indonesia
+        © 2026 BlackMess Enterprise · Jakarta, Indonesia
       </p>
       <p style="color:#374151;font-size:11px;margin:0;">
         Email ini dikirim otomatis. Harap tidak membalas email ini.
@@ -183,7 +183,7 @@ https://black-message.vercel.app
 """
 
     html, plain = _template(content, plain)
-    return _send(to_email, f'Kode masuk BlackMess Anda: {otp[:2]}****', html, plain)
+    return _send(to_email, 'BlackMess — Verifikasi Login Anda', html, plain)
 
 
 def send_invite_email(to_email: str, from_name: str, invite_link: str, workspace: str = 'BlackMess') -> bool:
