@@ -15,11 +15,6 @@ from .serializers import (
     SecureFileLinkSerializer, DLPRuleSerializer, HelpdeskTicketSerializer,
     InstitutionBadgeSerializer,
 )
-from .serializers import (
-    OJKIncidentSerializer, InformationBarrierSerializer, RemoteWipeSerializer,
-    SecureFileLinkSerializer, DLPRuleSerializer, HelpdeskTicketSerializer,
-    InstitutionBadgeSerializer,
-)
 from .models import (
     OJKIncidentReport, InformationBarrier, RemoteWipeRequest,
     SecureFileLink, DLPRule, HelpdeskTicket, HelpdeskComment,
