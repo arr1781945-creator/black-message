@@ -42,7 +42,10 @@ class ChannelSerializer(serializers.ModelSerializer):
 
 class ChannelMemberSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
-    display_name = serializers.CharField(source="user.display_name", read_only=True)
+    display_name = serializers.SerializerMethodField()
+
+    def get_display_name(self, obj):
+        return obj.user.get_full_name() or obj.user.username
 
     class Meta:
         model = ChannelMember

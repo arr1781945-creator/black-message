@@ -15,9 +15,13 @@ logger = logging.getLogger(__name__)
 
 
 class MessageListView(generics.ListCreateAPIView):
-    serializer_class = MessageSerializer
-    serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            from .serializers import MessageCreateSerializer
+            return MessageCreateSerializer
+        return MessageSerializer
 
     def get_queryset(self):
         channel_id = self.kwargs["channel_id"]

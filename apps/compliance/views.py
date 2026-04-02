@@ -10,6 +10,16 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from .serializers import (
+    OJKIncidentSerializer, InformationBarrierSerializer, RemoteWipeSerializer,
+    SecureFileLinkSerializer, DLPRuleSerializer, HelpdeskTicketSerializer,
+    InstitutionBadgeSerializer,
+)
+from .serializers import (
+    OJKIncidentSerializer, InformationBarrierSerializer, RemoteWipeSerializer,
+    SecureFileLinkSerializer, DLPRuleSerializer, HelpdeskTicketSerializer,
+    InstitutionBadgeSerializer,
+)
 from .models import (
     OJKIncidentReport, InformationBarrier, RemoteWipeRequest,
     SecureFileLink, DLPRule, HelpdeskTicket, HelpdeskComment,
@@ -67,6 +77,7 @@ def check_info_barrier(sender, receiver, workspace) -> bool:
 # ─── OJK Incident Report ──────────────────────────────────────────────────────
 
 class OJKIncidentViewSet(viewsets.ModelViewSet):
+    serializer_class = OJKIncidentSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -135,6 +146,7 @@ class OJKIncidentViewSet(viewsets.ModelViewSet):
 # ─── Information Barrier ──────────────────────────────────────────────────────
 
 class InformationBarrierViewSet(viewsets.ModelViewSet):
+    serializer_class = InformationBarrierSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -172,6 +184,7 @@ class InformationBarrierViewSet(viewsets.ModelViewSet):
 # ─── Remote Wipe ──────────────────────────────────────────────────────────────
 
 class RemoteWipeViewSet(viewsets.ModelViewSet):
+    serializer_class = RemoteWipeSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -213,6 +226,7 @@ class RemoteWipeViewSet(viewsets.ModelViewSet):
 # ─── Secure File Link ─────────────────────────────────────────────────────────
 
 class SecureFileLinkViewSet(viewsets.ModelViewSet):
+    serializer_class = SecureFileLinkSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -280,6 +294,7 @@ class SecureFileLinkViewSet(viewsets.ModelViewSet):
 # ─── DLP ──────────────────────────────────────────────────────────────────────
 
 class DLPRuleViewSet(viewsets.ModelViewSet):
+    serializer_class = DLPRuleSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -306,6 +321,7 @@ class DLPRuleViewSet(viewsets.ModelViewSet):
 # ─── Helpdesk ─────────────────────────────────────────────────────────────────
 
 class HelpdeskTicketViewSet(viewsets.ModelViewSet):
+    serializer_class = HelpdeskTicketSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -369,6 +385,7 @@ class HelpdeskTicketViewSet(viewsets.ModelViewSet):
 # ─── Institution Badge ────────────────────────────────────────────────────────
 
 class InstitutionBadgeViewSet(viewsets.ModelViewSet):
+    serializer_class = InstitutionBadgeSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
