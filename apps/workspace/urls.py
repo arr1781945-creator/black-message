@@ -9,5 +9,4 @@ router.register(r'(?P<workspace_slug>[^/.]+)/channels', ChannelViewSet, basename
 
 urlpatterns = [
     path('create/', WorkspaceCreateView.as_view(), name='workspace-create'),
-    path('', include(router.urls)),
-]
+] + router.urls
