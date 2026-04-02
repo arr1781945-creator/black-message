@@ -12,7 +12,7 @@
 <script>
 window.onload = function() {
     SwaggerUIBundle({
-        url: "{% url schema_url %}",
+        url: "{{ schema_url }}",
         dom_id: '#swagger-ui',
         presets: [
             SwaggerUIBundle.presets.apis,
