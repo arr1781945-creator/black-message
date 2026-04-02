@@ -11,3 +11,4 @@ liboqs/
 .env
 devops/.env
 .vercel
+db.sqlite3
