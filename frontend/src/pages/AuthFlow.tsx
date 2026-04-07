@@ -85,6 +85,7 @@ function AuthStep({ onNext }: { onNext: (user: User, step: Step) => void }) {
         if (!ok) { setError(data.detail || JSON.stringify(data)); setLoading(false); return }
         localStorage.setItem('bm_token', data.access)
         localStorage.setItem('bm_refresh', data.refresh || '')
+        if (data.workspace_id) localStorage.setItem('bm_workspace_id', data.workspace_id)
         const user = { name: data.user?.username || username, email, avatar: username[0].toUpperCase(), company: email.split('@')[1], username }
         // Kirim OTP verifikasi email
         await sendOTP(email, username)
@@ -95,6 +96,7 @@ function AuthStep({ onNext }: { onNext: (user: User, step: Step) => void }) {
         if (!ok) { setError(data.detail || 'Login gagal'); setLoading(false); return }
         localStorage.setItem('bm_token', data.access)
         localStorage.setItem('bm_refresh', data.refresh || '')
+        if (data.workspace_id) localStorage.setItem('bm_workspace_id', data.workspace_id)
         const user = { name: data.user?.username || username, email: data.user?.email || '', avatar: username[0].toUpperCase(), company: '', username }
         onNext(user, 'done')
       }

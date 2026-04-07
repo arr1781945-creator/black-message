@@ -20,6 +20,19 @@ class BankTokenObtainPairSerializer(TokenObtainPairSerializer):
         )
         return token
 
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        user = self.user
+        # Tambahkan workspace_id pertama milik user
+        from apps.workspace.models import WorkspaceMember
+        member = WorkspaceMember.objects.filter(user=user, status='active').first()
+        data['workspace_id'] = str(member.workspace.id) if member else None
+        data['user'] = {
+            'username': user.username,
+            'email': user.email,
+        }
+        return data
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
