@@ -209,8 +209,8 @@ SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'https://black-message-production.up.railway.app/oauth/done/'
-SOCIAL_AUTH_NEW_USER_REDIRECT_URL = 'https://black-message-production.up.railway.app/oauth/done/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'https://black-message.vercel.app/auth/callback'
+SOCIAL_AUTH_NEW_USER_REDIRECT_URL = 'https://black-message.vercel.app/auth/callback'
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',
