@@ -431,30 +431,28 @@ const InvitePage = ({ user }: { user: User }) => {
     if (!email.trim()) { setError('Masukkan email!'); return }
     if (!email.includes('@')) { setError('Email tidak valid!'); return }
 
-    const link = `http://localhost:3003/invite?ref=${btoa(email)}&from=${btoa(user.email)}`
     try {
+      const token = localStorage.getItem('bm_token')
+      const workspaceId = localStorage.getItem('bm_workspace_id')
       const res = await fetch('https://black-message-production.up.railway.app/api/v1/auth/invite/send/', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
         body: JSON.stringify({
           to_email: email,
-          from_name: user.name,
-          invite_link: link,
-          workspace: 'BlackMess'
+          workspace_id: workspaceId,
+          role: 'member'
         })
       })
+      const data = await res.json()
       if (res.ok) {
         setSent(prev => [...prev, email])
-        setEmail(''); setVaultError('')
+        setEmail(''); setError('')
         alert(`Undangan berhasil dikirim ke ${email}!`)
       } else {
-        setError('Gagal kirim email, coba lagi!')
+        setError(data.error || 'Gagal kirim email, coba lagi!')
       }
     } catch(e) {
-      // Fallback
-      setSent(prev => [...prev, email])
-      setEmail(''); setVaultError('')
-      alert(`Demo mode: Link undangan untuk ${email}:\n${link}`)
+      setError('Koneksi gagal, coba lagi!')
     }
   }
 

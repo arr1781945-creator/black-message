@@ -2,7 +2,7 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Content
 
-FROM_EMAIL = 'noreply@blackmess.app'
+FROM_EMAIL = 'blackmessage312415@gmail.com'
 FROM_NAME = 'BlackMess'
 
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '')
@@ -183,7 +183,7 @@ https://black-message.vercel.app
 """
 
     html, plain = _template(content, plain)
-    return _send(to_email, 'BlackMess — Verifikasi Login Anda', html, plain)
+    return _send(to_email, 'Kode OTP BlackMess Anda', html, plain)
 
 
 def send_invite_email(to_email: str, from_name: str, invite_link: str, workspace: str = 'BlackMess') -> bool:
