@@ -385,3 +385,50 @@ class InstitutionBadgeViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return InstitutionBadge.objects.filter(is_active=True)
+
+
+# ─── GDPR Views ───────────────────────────────────────────────────────────────
+from datetime import timedelta
+from .models import GDPRRequest
+from .serializers import GDPRRequestSerializer
+
+class GDPRRequestViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = GDPRRequestSerializer
+    http_method_names = ['get', 'post', 'head', 'options']
+
+    def get_queryset(self):
+        return GDPRRequest.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(
+            user=self.request.user,
+            due_date=timezone.now() + timedelta(days=30)
+        )
+
+    @action(detail=False, methods=['get'])
+    def my_data(self, request):
+        """Right to Access — return semua data user."""
+        from apps.users.models import BankUser
+        user = request.user
+        data = {
+            'username': user.username,
+            'email': user.email,
+            'date_joined': str(user.date_joined),
+            'gdpr_requests': GDPRRequestSerializer(
+                GDPRRequest.objects.filter(user=user), many=True
+            ).data,
+        }
+        return Response(data)
+
+    @action(detail=True, methods=['post'])
+    def process(self, request, pk=None):
+        """Admin only — proses GDPR request."""
+        if not request.user.is_staff:
+            return Response({'detail': 'Forbidden'}, status=403)
+        obj = self.get_object()
+        obj.status = 'completed'
+        obj.completed_at = timezone.now()
+        obj.processed_by = request.user
+        obj.save()
+        return Response({'detail': 'Request completed.'})

@@ -86,3 +86,16 @@ class InstitutionBadgeSerializer(serializers.ModelSerializer):
         fields = ["id", "workspace", "institution_name", "institution_code", "verified_by",
                   "verified_at", "badge_level", "is_active", "expires_at", "created_at"]
         read_only_fields = ["id", "created_at"]
+
+
+class GDPRRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = __import__('apps.compliance.models', fromlist=['GDPRRequest']).GDPRRequest
+        fields = [
+            'id', 'request_type', 'status', 'due_date',
+            'response_data_cid', 'created_at', 'completed_at'
+        ]
+        read_only_fields = [
+            'id', 'status', 'due_date',
+            'response_data_cid', 'created_at', 'completed_at'
+        ]
