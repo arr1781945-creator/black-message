@@ -20,6 +20,7 @@ Risk Score = Likelihood × Impact (Scale 1-5)
 | R8 | Data loss | 2 | 5 | 10 | Backup + IPFS redundancy |
 | R9 | Compliance violation | 2 | 4 | 8 | GDPR + OJK/BI controls |
 | R10 | Key compromise | 1 | 5 | 5 | Key rotation protocol |
+| R11 | Key Person Dependency | 3 | 5 | 15 | Emergency Access Procedure + Documentation-as-Code |
 
 ## 3. Risk Treatment
 - **Accept:** R3 (quantum attack — mitigated by PQC)

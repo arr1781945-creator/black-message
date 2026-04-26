@@ -29,3 +29,11 @@
 - Admin actions logged in audit trail
 - Remote wipe capability for compromised devices
 - JWT blacklist for immediate revocation
+
+## 5. Emergency Access Procedure (Key Person Dependency Mitigation)
+In the event the primary owner (Akbar Ramadhan) is unavailable:
+1. All system documentation is version-controlled in GitHub (documentation-as-code)
+2. Encrypted emergency access credentials stored in PQC vault (ML-KEM-1024)
+3. Recovery procedure documented in /docs/emergency_recovery.md
+4. Automated backup: PostgreSQL daily, IPFS distributed redundancy
+5. Any designated successor must complete background screening per Control 6.1

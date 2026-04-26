@@ -14,9 +14,9 @@ Nonconformities identified via:
 
 | ID | Finding | Root Cause | Action | Status |
 |----|---------|------------|--------|--------|
-| NC1 | CSP blocks inline CSS | unsafe-inline removed | Add unsafe-hashes | In Progress |
-| NC2 | GDPR endpoint not deployed | Git push issue | Force push | In Progress |
-| NC3 | Privacy Policy page missing | Frontend not built | Add to frontend | Planned |
+| NC1 | CSP blocks inline CSS | unsafe-inline removed | CSP hardened, nonce-based | Closed |
+| NC2 | GDPR endpoint not deployed | Git push issue | Deployed via Vercel | Closed |
+| NC3 | Privacy Policy page missing | Frontend not built | Added to AuthFlow.tsx | Closed |
 
 ## 3. Corrective Action Process
 1. Identify nonconformity

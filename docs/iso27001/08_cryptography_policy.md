@@ -26,3 +26,13 @@
 - Key rotation: ML-DSA-65 < 1ms overhead
 - Compromise response: immediate revocation + JWT blacklist
 - Audit trail for all key operations
+
+## 4. Key Rotation Without E2EE Message Loss
+Key rotation in BlackMess follows a forward-secrecy model:
+1. New ML-DSA-65 + ML-KEM-1024 keypair generated for new sessions
+2. Old keypairs retained in encrypted vault (ML-KEM-1024) for decryption of historical messages
+3. New messages encrypted with new session keys only
+4. Key rotation overhead: < 5ms (automated via key_rotation_protocol.py)
+5. Users notified to re-establish E2EE sessions post-rotation
+6. JWT tokens invalidated immediately upon rotation
+7. Rotation schedule: Triggered by compromise report or every 90 days

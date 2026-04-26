@@ -14,7 +14,7 @@
 | 5.16 | Identity management | Yes | Yes | JWT + WebAuthn |
 | 5.17 | Authentication | Yes | Yes | MFA + FIDO2 |
 | 5.23 | Cloud services security | Yes | Yes | Railway + Vercel |
-| 6.1 | Screening | No | No | Solo operation |
+| 6.1 | Screening | Yes | Yes | Background check (CV/KTP) mandatory for any future contractor or collaborator |
 | 8.1 | User endpoint devices | Yes | Yes | Anti-forensics |
 | 8.2 | Privileged access | Yes | Yes | Admin RBAC |
 | 8.5 | Secure authentication | Yes | Yes | PQ MFA |
