@@ -1,25 +1,34 @@
-FROM openquantumsafe/liboqs-python:latest
+FROM python:3.12-slim
 
 WORKDIR /app
 
-# System deps + liboqs build tools
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    gcc g++ libpq-dev cmake ninja-build \
-    libssl-dev python3-dev git build-essential \
+    gcc \
+    g++ \
+    cmake \
+    ninja-build \
+    libssl-dev \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python deps dulu
+# Install liboqs from source
+RUN git clone --depth 1 https://github.com/open-quantum-safe/liboqs.git && \
+    cmake -S liboqs -B liboqs/build -DBUILD_SHARED_LIBS=ON && \
+    cmake --build liboqs/build -j4 && \
+    cmake --build liboqs/build --target install && \
+    rm -rf liboqs
+
+# Install liboqs-python
+RUN pip install liboqs-python --break-system-packages 2>/dev/null || pip install liboqs-python
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# liboqs already in base image
-
-ARG CACHE_BUST=1776290743
 COPY . .
 
-RUN python manage.py collectstatic --noinput || true
+RUN python manage.py collectstatic --noinput 2>/dev/null || true
 
 EXPOSE 8000
 
-CMD sh -c 'python manage.py migrate --no-input && daphne -b 0.0.0.0 -p ${{PORT:-8000}} core.asgi:application'
-# force Thu Apr  2 12:14:34 WIT 2026
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:$PORT", "--workers", "2"]
