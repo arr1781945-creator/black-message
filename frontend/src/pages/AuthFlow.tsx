@@ -145,7 +145,7 @@ function AuthStep({ onNext }: { onNext: (user: User, step: Step) => void }) {
         {loading ? 'Memproses...' : tab === 'login' ? 'Masuk' : 'Daftar'}
       </button>
       <p style={{ color:'#ABABAD', fontSize:11, textAlign:'center', marginTop:12, lineHeight:'1.6' }}>
-        Dengan melanjutkan, kamu menyetujui <a href="/privacy-policy" style={{ color:'#7C3AED' }}>Kebijakan Privasi</a> dan <a href="/terms" style={{ color:'#7C3AED' }}>Syarat Penggunaan</a> kami. Data kamu dilindungi dengan enkripsi E2EE dan standar keamanan PQC FIPS 203/204. BlackMess tidak menjual data pribadi kamu kepada pihak ketiga.
+        By continuing, you agree to our <a href="/terms" style={{ color:'#7C3AED' }}>Terms of Service</a> and <a href="/privacy-policy" style={{ color:'#7C3AED' }}>Privacy Policy</a>.
       </p>
     </div>
   )
