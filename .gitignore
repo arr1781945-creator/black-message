@@ -13,3 +13,4 @@ devops/.env
 .vercel
 db.sqlite3
 db.sqlite3
+secret.txt
