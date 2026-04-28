@@ -9,8 +9,8 @@ from .views import WorkspaceViewSet, ChannelViewSet
 from .views_create import WorkspaceCreateView
 
 router = DefaultRouter()
-router.register(rr'', WorkspaceViewSet, basename='workspace')
-router.register(rr'(?P<workspace_slug>[^/.]+)/channels', ChannelViewSet, basename='channel')
+router.register(r'', WorkspaceViewSet, basename='workspace')
+router.register(r'(?P<workspace_slug>[^/.]+)/channels', ChannelViewSet, basename='channel')
 
 urlpatterns = [
     # FIXED: custom path HARUS di atas router.urls
