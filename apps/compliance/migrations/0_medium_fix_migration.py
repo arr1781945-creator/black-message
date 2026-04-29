@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         # Sesuaikan dengan migration terakhir compliance yang ada
-        ('compliance', '0001_initial'),   # <-- SESUAIKAN
+        ('compliance', '0013_emergencyaccesslog_immutableauditlog_channelpolicy_and_more'),   # <-- SESUAIKAN
         ('workspace', '0001_initial'),
         ('users', '0001_initial'),
     ]
