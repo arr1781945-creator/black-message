@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
         ('users', '0001_initial'),
     ]
 
+    atomic = False
     operations = [
 
         # ── FIX #1: Hapus log_retention_wipe dari ForensicsBlock ──────────
@@ -77,6 +78,7 @@ class Migration(migrations.Migration):
 
         # ── FIX #3: Tambah field timestamp eksplisit ke ImmutableAuditLog ─
         migrations.AddField(
+            preserve_default=True,
             model_name='immutableauditlog',
             name='timestamp',
             field=models.DateTimeField(
@@ -88,6 +90,7 @@ class Migration(migrations.Migration):
 
         # ── FIX #4: EmergencyAccessLog — FK fields baru ───────────────────
         migrations.AddField(
+            preserve_default=True,
             model_name='emergencyaccesslog',
             name='workspace',
             field=models.ForeignKey(
@@ -98,6 +101,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
+            preserve_default=True,
             model_name='emergencyaccesslog',
             name='approver_1_fk',
             field=models.ForeignKey(
@@ -108,11 +112,13 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
+            preserve_default=True,
             model_name='emergencyaccesslog',
             name='approver_1_at',
             field=models.DateTimeField(null=True, blank=True),
         ),
         migrations.AddField(
+            preserve_default=True,
             model_name='emergencyaccesslog',
             name='approver_2_fk',
             field=models.ForeignKey(
@@ -123,11 +129,13 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
+            preserve_default=True,
             model_name='emergencyaccesslog',
             name='approver_2_at',
             field=models.DateTimeField(null=True, blank=True),
         ),
         migrations.AddField(
+            preserve_default=True,
             model_name='emergencyaccesslog',
             name='requested_by_fk',
             field=models.ForeignKey(
@@ -138,6 +146,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
+            preserve_default=True,
             model_name='emergencyaccesslog',
             name='target_user_fk',
             field=models.ForeignKey(
@@ -148,6 +157,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
+            preserve_default=True,
             model_name='emergencyaccesslog',
             name='status',
             field=models.CharField(
@@ -162,6 +172,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
+            preserve_default=True,
             model_name='emergencyaccesslog',
             name='expires_at',
             field=models.DateTimeField(null=True, blank=True),
