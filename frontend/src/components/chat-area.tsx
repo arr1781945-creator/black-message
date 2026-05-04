@@ -1,3 +1,4 @@
+import { getOrCreateSessionKey, encryptMessage, decryptMessage } from "../lib/e2ee"
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useDropzone } from "react-dropzone"
 import { HashIcon, StarIcon, UsersIcon, MoreIcon, PaperclipIcon, SmileIcon, SendIcon, MicIcon, VideoIcon, PhoneIcon } from "./icons"
@@ -79,21 +80,30 @@ export function ChatArea({ channel = "umum", currentUser, onVideoCall, onProfile
     ws.onclose = () => setWsStatus('disconnected')
   }
 
-  const send = () => {
+  const send = async () => {
     if (!input.trim()) return
     const now = new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'})
     const msgId = Date.now().toString()
+    const plaintext = input.trim()
+
+    const sessionKey = await getOrCreateSessionKey(channel || 'default')
+    const { ciphertext_b64, nonce_b64, auth_tag_b64 } = await encryptMessage(plaintext, sessionKey)
+
     const newMsg = {
       id: msgId,
       user: currentUser?.name || 'Saya',
       avatar: currentUser?.avatar || 'S',
       color: 'from-gray-700 to-gray-800',
-      time: now, content: input.trim(),
-      replies: [], reactions: {}, pinned: false
+      time: now, content: plaintext,
+      replies: [], reactions: {}, pinned: false,
+      encrypted: true,
     }
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({
-        message: input.trim(),
+        message: plaintext,
+        ciphertext_b64,
+        nonce_b64,
+        auth_tag_b64,
         user: currentUser?.name || 'Saya',
         avatar: currentUser?.avatar || 'S',
         id: msgId, time: now,
