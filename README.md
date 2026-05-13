@@ -46,7 +46,7 @@
 
 ]()
 
-*Built by a 13-year-old developer from Ternate, Indonesia*
+*Built by a 19-year-old developer from Ternate, Indonesia*
 
 [Live Demo](https://black-message.vercel.app) · [API Docs](https://black-message-production.up.railway.app/api/docs/admin/)
 
