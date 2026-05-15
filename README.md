@@ -189,7 +189,7 @@ railway up
 # Frontend (Vercel)
 vercel --prod
 Developer
-Built by a 13-year-old self-taught developer from Ternate, North Maluku, Indonesia.
+Built by a 19-year-old self-taught developer from Ternate, North Maluku, Indonesia.
 Working entirely on Android (Termux)
 No formal computer science education
 Bug bounty hunter (HackerOne, Bugcrowd)
