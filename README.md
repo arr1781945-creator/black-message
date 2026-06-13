@@ -15,38 +15,20 @@
 
 **Enterprise Remote Work Platform with Post-Quantum Cryptography**
 
-[
-
 ![License](https://img.shields.io/badge/License-Enterprise-purple.svg)
-
-]()
-[
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue.svg)
 
-]()
-[
-
 ![Django](https://img.shields.io/badge/Django-6.0-green.svg)
-
-]()
-[
 
 ![React](https://img.shields.io/badge/React-18-61dafb.svg)
 
-]()
-[
-
 ![PQC](https://img.shields.io/badge/PQC-ML--KEM--1024-red.svg)
-
-]()
-[
 
 ![OJK](https://img.shields.io/badge/Compliant-OJK%2FBI-orange.svg)
 
-]()
 
-*Built by a 19-year-old developer from Ternate, Indonesia*
+*Built by a 13-year-old developer from Ternate, Indonesia*
 
 [Live Demo](https://black-message.vercel.app) · [API Docs](https://black-message-production.up.railway.app/api/docs/admin/)
 
@@ -114,13 +96,13 @@ Auth:       WebAuthn/FIDO2, TOTP, JWT, OAuth
 Deploy:     Railway (backend) + Vercel (frontend)
 ## Architecture
 ┌─────────────────────────────────────────────────────────┐
-│                    Client (Browser)                      │
-│  React + WebAuthn + TOTP + E2EE (client-side)           │
+│                    Client (Browser)                               │
+│  React + WebAuthn + TOTP + E2EE (client-side)                     │
 └──────────────────────┬──────────────────────────────────┘
 │ HTTPS + WSS
 ┌──────────────────────▼──────────────────────────────────┐
-│                  Django Backend                           │
-│  ┌─────────┐ ┌──────────┐ ┌──────────┐ ┌───────────┐   │
+│                  Django Backend                                    │
+│  ┌─────────┐ ┌──────────┐ ┌──────────┐ ┌───────────┐      │
 │  │  Auth   │ │Messaging │ │Compliance│ │   Vault   │   │
 │  │WebAuthn │ │WebSocket │ │ Audit    │ │PQC Keys   │   │
 │  │FIDO2    │ │E2EE      │ │OJK/BI    │ │Shamir     │   │
